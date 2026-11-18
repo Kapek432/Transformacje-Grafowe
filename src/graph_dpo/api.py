@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .exports import EXPORT_FILENAMES, ExportFormat, export_bytes
 from .matching import dangling_edge, find_matches
@@ -65,6 +66,8 @@ def create_app(examples_dir: Path, static_dir: Path | None = None) -> FastAPI:
         The configured FastAPI application.
     """
     app = FastAPI(title="Transformacje grafowe DPO")
+    # The API writes files, so a rebinding page must not reach it under another host name.
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
     @app.exception_handler(ValueError)
     async def invalid_input(_: Request, exc: ValueError) -> JSONResponse:
@@ -79,7 +82,11 @@ def create_app(examples_dir: Path, static_dir: Path | None = None) -> FastAPI:
 
     @app.get("/api/examples")
     def list_examples() -> list[str]:
-        return sorted(path.stem for path in examples_dir.glob("*.json"))
+        return sorted(
+            path.stem
+            for path in examples_dir.glob("*.json")
+            if EXAMPLE_NAME.fullmatch(path.stem)
+        )
 
     @app.get("/api/examples/{name}")
     def read_example(name: str) -> Any:
@@ -93,9 +100,9 @@ def create_app(examples_dir: Path, static_dir: Path | None = None) -> FastAPI:
         name: str, document: dict[str, Any], overwrite: bool = False
     ) -> dict[str, str]:
         path = example_path(name)
+        parse_rule_input(document)
         if path.exists() and not overwrite:
             raise HTTPException(409, "Przykład o tej nazwie już istnieje.")
-        parse_rule_input(document)
         examples_dir.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

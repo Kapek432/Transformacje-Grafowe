@@ -116,9 +116,14 @@ def export_bytes(
 
     Returns:
         The file content.
+
+    Raises:
+        ValueError: If the format is unknown.
     """
     if fmt == "json":
         return _json_bytes(result)
+    if fmt not in ("csv", "excel"):
+        raise ValueError(f"Nieznany format eksportu: {fmt}")
     tables = _tables(host, result)
     return _zip_bytes(tables) if fmt == "csv" else _excel_bytes(tables)
 

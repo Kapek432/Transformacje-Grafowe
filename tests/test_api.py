@@ -27,7 +27,7 @@ def examples(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def client(examples: Path) -> TestClient:
-    return TestClient(create_app(examples))
+    return TestClient(create_app(examples), base_url="http://127.0.0.1")
 
 
 def test_lists_and_reads_examples(client: TestClient) -> None:
@@ -140,7 +140,27 @@ def test_serves_frontend(examples: Path, tmp_path: Path) -> None:
     static = tmp_path / "dist"
     static.mkdir()
     (static / "index.html").write_text("<h1>DPO</h1>", encoding="utf-8")
-    client = TestClient(create_app(examples, static))
+    client = TestClient(create_app(examples, static), base_url="http://127.0.0.1")
 
     assert "DPO" in client.get("/").text
     assert client.get("/api/examples").status_code == 200
+
+
+def test_rejects_foreign_host(client: TestClient) -> None:
+    response = client.get("/api/examples", headers={"Host": "evil.example"})
+
+    assert response.status_code == 400
+
+
+def test_invalid_document_is_checked_before_overwrite_conflict(
+    client: TestClient,
+) -> None:
+    response = client.put("/api/examples/slide8", json={"graph": {}})
+
+    assert response.status_code == 422
+
+
+def test_lists_only_valid_example_names(client: TestClient, examples: Path) -> None:
+    (examples / "bad name.json").write_text("{}", encoding="utf-8")
+
+    assert client.get("/api/examples").json() == ["slide8", "slide8_rejected"]

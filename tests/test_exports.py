@@ -3,6 +3,7 @@ import json
 import zipfile
 from pathlib import Path
 
+import pytest
 from openpyxl import load_workbook
 
 from graph_dpo.exports import export_bytes
@@ -44,3 +45,10 @@ def test_excel_export() -> None:
         assert workbook.sheetnames == ["Wierzchołki", "Krawędzie", "Status"]
     finally:
         workbook.close()
+
+
+def test_unknown_format_is_rejected() -> None:
+    host, result = _result()
+
+    with pytest.raises(ValueError, match="Nieznany format eksportu"):
+        export_bytes(host, result, "pdf")  # type: ignore[arg-type]
