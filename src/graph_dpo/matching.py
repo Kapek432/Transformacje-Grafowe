@@ -52,7 +52,6 @@ class _Search:
             group = max(position[source], position[target])
             self.edge_groups[group].append((edge_id, source, target))
         self.host_nodes = host.nodes
-        self.host_node_ids = set(host.nodes)
         self.parallel: dict[tuple[str, str], list[str]] = defaultdict(list)
         for edge_id, ends in host.edges.items():
             self.parallel[ends].append(edge_id)
@@ -73,8 +72,6 @@ class _Search:
         used = set(self.nodes.values())
         for candidate in self.host_nodes:
             if candidate not in used:
-                if node in self.host_node_ids and candidate != node:
-                    continue
                 self.nodes[node] = candidate
                 yield from self._assign_edges(index, 0)
                 del self.nodes[node]

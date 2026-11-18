@@ -31,11 +31,15 @@ def test_dangling_edge_is_none_when_rule_applies() -> None:
     assert dangling_edge(host, rule, match) is None
 
 
-def test_dangling_edge_reports_blocking_edge() -> None:
+def test_rejected_example_has_applicable_and_blocked_match() -> None:
     host, rule = parse_rule_input(_load("slide8_rejected.json"))
-    [match] = find_matches(host, rule.left)
 
-    assert dangling_edge(host, rule, match) == "E-C"
+    first, second = find_matches(host, rule.left)
+
+    assert first.nodes == {"D": "D", "E": "C", "F": "E"}
+    assert dangling_edge(host, rule, first) is None
+    assert second.nodes == {"D": "D", "E": "E", "F": "F"}
+    assert dangling_edge(host, rule, second) == "E-C"
 
 
 def test_loop_matches_only_loop() -> None:
