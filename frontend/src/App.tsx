@@ -7,6 +7,7 @@ import { EditorTab } from "./components/EditorTab";
 import { TopBar } from "./components/TopBar";
 import { TransformTab } from "./components/TransformTab";
 import { documentReducer, emptyDocument } from "./lib/document";
+import { interfaceDiffers } from "./lib/rule";
 import type { DpoDocument } from "./lib/types";
 
 const DEFAULT_EXAMPLE = "slide8";
@@ -22,6 +23,16 @@ export default function App() {
   const [tab, setTab] = useState<string | null>("edit");
   const dark = useComputedColorScheme("light") === "dark";
 
+  const loadExternal = (next: DpoDocument, name: string | null) => {
+    load(next, name);
+    if (interfaceDiffers(next.rule)) {
+      notifications.show({
+        color: "yellow",
+        message: "K w pliku różni się od K wyznaczonego z L i R. Użyto wyznaczonego.",
+      });
+    }
+  };
+
   const load = (next: DpoDocument, name: string | null) => {
     dispatch({ type: "load", document: next });
     setCurrent(name);
@@ -29,7 +40,7 @@ export default function App() {
   };
 
   const openExample = (name: string) =>
-    api.readExample(name).then((next) => load(next, name)).catch(notifyError("Nie wczytano przykładu"));
+    api.readExample(name).then((next) => loadExternal(next, name)).catch(notifyError("Nie wczytano przykładu"));
 
   useEffect(() => {
     api
@@ -66,7 +77,7 @@ export default function App() {
           onSelectExample={(name) => void openExample(name)}
           onNew={() => load(emptyDocument(), null)}
           onSave={save}
-          onUpload={(next) => load(next, null)}
+          onUpload={(next) => loadExternal(next, null)}
           onDownload={download}
         />
       </AppShell.Header>

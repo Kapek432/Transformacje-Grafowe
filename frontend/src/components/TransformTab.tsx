@@ -90,6 +90,7 @@ export function TransformTab({ doc, dispatch, dark }: Props) {
         setMatches(response);
         const preset = doc.match ? response.matches.findIndex((m) => sameMatch(m, doc.match!)) : -1;
         if (preset >= 0) choose(response.matches[preset], preset);
+        else if (doc.match) dispatch({ type: "setMatch", match: undefined });
       })
       .catch((exception) => {
         if (!cancelled) setError((exception as Error).message);

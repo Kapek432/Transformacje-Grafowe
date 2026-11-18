@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveInterface } from "./rule";
+import { deriveInterface, interfaceDiffers } from "./rule";
 
 describe("deriveInterface", () => {
   it("keeps nodes and edges shared by L and R", () => {
@@ -39,5 +39,25 @@ describe("deriveInterface", () => {
       K: { nodes: ["a", "b"], edges: [] },
       conflicts: ["x"],
     });
+  });
+});
+
+describe("interfaceDiffers", () => {
+  const L = {
+    nodes: ["a", "b"],
+    edges: [{ id: "x", source: "a", target: "b" }],
+  };
+
+  it("ignores element order", () => {
+    const K = { nodes: ["b", "a"], edges: [{ id: "x", source: "a", target: "b" }] };
+
+    expect(interfaceDiffers({ L, K, R: L })).toBe(false);
+  });
+
+  it("detects a missing node or edge and changed endpoints", () => {
+    expect(interfaceDiffers({ L, K: { nodes: ["a"], edges: [] }, R: L })).toBe(true);
+    expect(interfaceDiffers({ L, K: { nodes: ["a", "b"], edges: [] }, R: L })).toBe(true);
+    const K = { nodes: ["a", "b"], edges: [{ id: "x", source: "b", target: "a" }] };
+    expect(interfaceDiffers({ L, K, R: L })).toBe(true);
   });
 });

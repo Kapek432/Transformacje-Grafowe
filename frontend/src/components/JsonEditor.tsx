@@ -2,6 +2,7 @@ import { json } from "@codemirror/lang-json";
 import { Stack, Text } from "@mantine/core";
 import CodeMirror from "@uiw/react-codemirror";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { normalizeDocument } from "../lib/document";
 import { parseDocument } from "../lib/parse";
 import type { DpoDocument } from "../lib/types";
 
@@ -16,6 +17,7 @@ export function JsonEditor({ doc, dark, onChange }: Props) {
   const [text, setText] = useState(serialized);
   const [error, setError] = useState<string | null>(null);
   // Skipping the echo of our own edit keeps the cursor and formatting while typing.
+  // It is compared in the reducer's normalized form because loading re-derives K.
   const lastSent = useRef<string | null>(null);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export function JsonEditor({ doc, dark, onChange }: Props) {
     setText(value);
     try {
       const parsed = parseDocument(value);
-      lastSent.current = JSON.stringify(parsed, null, 2);
+      lastSent.current = JSON.stringify(normalizeDocument(parsed), null, 2);
       setError(null);
       onChange(parsed);
     } catch (exception) {

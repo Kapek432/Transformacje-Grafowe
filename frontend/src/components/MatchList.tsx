@@ -40,7 +40,7 @@ export function MatchList({ response, error, selected, onHover, onSelect }: Prop
       </Text>
       {response.truncated && (
         <Alert color="yellow" variant="light">
-          Pokazano pierwsze 200 dopasowań.
+          Pokazano pierwsze {response.matches.length} dopasowań.
         </Alert>
       )}
       <ScrollArea.Autosize mah={560}>

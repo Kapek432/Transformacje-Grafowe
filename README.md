@@ -17,7 +17,7 @@ Kod wyjścia `0` oznacza wykonaną transformację, `3` odrzucenie reguły z zapi
 
 ## Interfejs graficzny
 
-Pierwsze uruchomienie wymaga zbudowania frontendu (Node 20+):
+Pierwsze uruchomienie wymaga zbudowania frontendu (Node 20.19+ lub 22.12+):
 
 ```sh
 cd frontend && npm install && npm run build && cd ..

@@ -32,12 +32,16 @@ function withRule(doc: DpoDocument, left: GraphData, right: GraphData): DpoDocum
   return { ...doc, rule: { L: left, K: deriveInterface(left, right).K, R: right } };
 }
 
+/** The form in which the reducer stores a loaded document, with K derived from L and R. */
+export function normalizeDocument(document: DpoDocument): DpoDocument {
+  const doc = { ...document, layout: document.layout ?? {} };
+  return withRule(doc, doc.rule.L, doc.rule.R);
+}
+
 export function documentReducer(state: DpoDocument, action: DocumentAction): DpoDocument {
   switch (action.type) {
-    case "load": {
-      const doc = { ...action.document, layout: action.document.layout ?? {} };
-      return withRule(doc, doc.rule.L, doc.rule.R);
-    }
+    case "load":
+      return normalizeDocument(action.document);
     case "editGraph": {
       const layout = action.positions
         ? { ...state.layout, [action.name]: action.positions }

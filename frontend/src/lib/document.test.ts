@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { documentReducer, emptyDocument } from "./document";
+import { documentReducer, emptyDocument, normalizeDocument } from "./document";
 
 const L = { nodes: ["a", "b"], edges: [{ id: "x", source: "a", target: "b" }] };
 
@@ -50,5 +50,14 @@ describe("documentReducer", () => {
     doc.rule = { L, K: { nodes: [], edges: [] }, R: L };
 
     expect(documentReducer(emptyDocument(), { type: "load", document: doc }).rule.K).toEqual(L);
+  });
+});
+
+describe("normalizeDocument", () => {
+  it("matches what the reducer stores on load", () => {
+    const doc = emptyDocument();
+    doc.rule = { L, K: { nodes: [], edges: [] }, R: L };
+
+    expect(normalizeDocument(doc)).toEqual(documentReducer(emptyDocument(), { type: "load", document: doc }));
   });
 });
