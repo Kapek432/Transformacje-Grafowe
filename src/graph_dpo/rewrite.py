@@ -1,3 +1,4 @@
+from .matching import dangling_edge, deleted_elements
 from .models import MAX_ID_LENGTH, Applied, Graph, GraphData, Match, Rejected, Rule
 from .validation import parse_input
 
@@ -14,18 +15,11 @@ def _fresh(preferred: str, used: set[str]) -> str:
 
 
 def _rewrite(host: Graph, rule: Rule, match: Match) -> Applied | Rejected:
-    left, interface, right = rule.left, rule.interface, rule.right
-    removed_nodes = {
-        match.nodes[node] for node in set(left.nodes) - set(interface.nodes)
-    }
-    removed_edges = {
-        match.edges[edge] for edge in left.edges.keys() - interface.edges.keys()
-    }
-    for edge_id, (source, target) in host.edges.items():
-        if edge_id not in removed_edges and (
-            source in removed_nodes or target in removed_nodes
-        ):
-            return {"status": "rejected", "reason": "dangling_edge", "edge_id": edge_id}
+    interface, right = rule.interface, rule.right
+    blocking = dangling_edge(host, rule, match)
+    if blocking is not None:
+        return {"status": "rejected", "reason": "dangling_edge", "edge_id": blocking}
+    removed_nodes, removed_edges = deleted_elements(rule, match)
 
     # The first square leaves the preserved interface and the host context in D.
     intermediate = Graph(

@@ -67,6 +67,27 @@ def _mapping(
     return mapping
 
 
+def parse_rule_input(document: object) -> tuple[Graph, Rule]:
+    """Validate the host graph and rule from a JSON document, ignoring the match.
+
+    Args:
+        document: A decoded JSON document containing graph and rule.
+
+    Returns:
+        The host graph and the rule.
+
+    Raises:
+        ValueError: The input graph or rule is malformed.
+    """
+    data = _object(document, "wejście")
+    host = _graph(data.get("graph"), "G")
+    rule = _object(data.get("rule"), "rule")
+    left, interface, right = (_graph(rule.get(name), name) for name in ("L", "K", "R"))
+    _validate_interface(interface, left, "L")
+    _validate_interface(interface, right, "R")
+    return host, Rule(left, interface, right)
+
+
 def parse_input(document: object) -> tuple[Graph, Rule, Match]:
     """Validate the host graph, rule, and injective match from a JSON document.
 
@@ -79,24 +100,18 @@ def parse_input(document: object) -> tuple[Graph, Rule, Match]:
     Raises:
         ValueError: The input graph, rule, or match is malformed.
     """
-    data = _object(document, "wejście")
-    host = _graph(data.get("graph"), "G")
-    rule = _object(data.get("rule"), "rule")
-    left, interface, right = (_graph(rule.get(name), name) for name in ("L", "K", "R"))
-    _validate_interface(interface, left, "L")
-    _validate_interface(interface, right, "R")
-
-    match = _object(data.get("match"), "match")
+    host, rule = parse_rule_input(document)
+    match = _object(_object(document, "wejście").get("match"), "match")
     node_match = _mapping(
-        match.get("nodes"), "match.nodes", set(left.nodes), set(host.nodes)
+        match.get("nodes"), "match.nodes", set(rule.left.nodes), set(host.nodes)
     )
     edge_match = _mapping(
-        match.get("edges"), "match.edges", set(left.edges), set(host.edges)
+        match.get("edges"), "match.edges", set(rule.left.edges), set(host.edges)
     )
-    for edge_id, (source, target) in left.edges.items():
+    for edge_id, (source, target) in rule.left.edges.items():
         if host.edges[edge_match[edge_id]] != (node_match[source], node_match[target]):
             raise ValueError(
                 f"Dopasowanie nie zachowuje końców krawędzi {edge_id!r} z L."
             )
 
-    return host, Rule(left, interface, right), Match(node_match, edge_match)
+    return host, rule, Match(node_match, edge_match)
