@@ -15,6 +15,23 @@ Każde uruchomienie na poprawnym wejściu zapisuje `output.json`. Flaga `--csv` 
 
 Kod wyjścia `0` oznacza wykonaną transformację, `3` odrzucenie reguły z zapisem wyniku, a `1` błąd danych lub pliku. Domyślny katalog wyjściowy to `wynik`. Polecenia używają osobnych podkatalogów, żeby wyniki obu prób były dostępne obok siebie.
 
+## Interfejs graficzny
+
+Pierwsze uruchomienie wymaga zbudowania frontendu (Node 20+):
+
+```sh
+cd frontend && npm install && npm run build && cd ..
+uv run dpo-ui
+```
+
+Polecenie uruchamia serwer na `http://127.0.0.1:8000` i otwiera przeglądarkę. Opcje: `--port` oraz `--no-browser`.
+
+W zakładce „Edycja” rysujesz G, L i R. Dwuklik na tle dodaje wierzchołek, a w trybie „Rysowanie krawędzi” przeciągnięcie łączy dwa wierzchołki. Elementy o tym samym id w L i R tworzą K i mają fioletową obwódkę. Edytor JSON obok płócien jest zsynchronizowany z rysunkiem. „Zapisz” zapisuje przykład w `examples/` razem z pozycjami wierzchołków (pole `layout`, które CLI pomija). Plik zawiera `match`, jeśli wybrano dopasowanie, więc można go potem uruchomić przez `dpo.py`.
+
+Zakładka „Transformacja” wyszukuje wszystkie injektywne dopasowania L w G (najwyżej 200) i oznacza te, które łamią warunek wiszącej krawędzi. Po wyborze dopasowania widać G, D i H obok siebie albo animację krok po kroku, a wynik można pobrać jako JSON, CSV lub Excel.
+
+Praca nad frontendem z automatycznym przeładowaniem: `uv run dpo-ui --no-browser` w jednym terminalu i `npm run dev` w `frontend/` w drugim.
+
 ## Schemat JSON (wejście)
 
 Plik wejściowy to jeden obiekt z polami `graph`, `rule` i `match`:
@@ -87,10 +104,16 @@ Przy odrzuceniu (`status: "rejected"`):
 | `rewrite.py` | Warunek wiszącej krawędzi oraz konstrukcja grafów pośredniego i wynikowego |
 | `exports.py` | Zapis JSON, CSV i Excela |
 | `cli.py` | Argumenty polecenia, odczyt pliku i komunikaty |
+| `matching.py` | Wyszukiwanie dopasowań i warunek wiszącej krawędzi |
+| `api.py` | Endpointy HTTP dla interfejsu |
+| `server.py` | Polecenie `dpo-ui` |
+
+Frontend znajduje się w `frontend/src`: logika w `lib/`, komponenty w `components/`.
 
 ## Sprawdzenie projektu
 
 ```sh
 uv run python -m pytest -q
 uv run ruff check .
+cd frontend && npm test && npm run typecheck
 ```
