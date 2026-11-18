@@ -4,7 +4,7 @@ Program wykonuje jeden krok Double Pushout na skończonym grafie skierowanym. Da
 
 ## Uruchomienie
 
-Z katalogu `dpo`, z Pythonem 3.11+ i `uv`:
+Z katalogu projektu, z Pythonem 3.11+ i `uv`:
 
 ```sh
 uv run python dpo.py examples/slide8.json --output-dir wynik/udany --csv --excel
@@ -15,14 +15,66 @@ Każde uruchomienie na poprawnym wejściu zapisuje `output.json`. Flaga `--csv` 
 
 Kod wyjścia `0` oznacza wykonaną transformację, `3` odrzucenie reguły z zapisem wyniku, a `1` błąd danych lub pliku. Domyślny katalog wyjściowy to `wynik`. Polecenia używają osobnych podkatalogów, żeby wyniki obu prób były dostępne obok siebie.
 
+## Schemat JSON (wejście)
+
+Plik wejściowy to jeden obiekt z polami `graph`, `rule` i `match`:
+
+```json
+{
+  "graph": {
+    "nodes": ["…"],
+    "edges": [{ "id": "…", "source": "…", "target": "…" }]
+  },
+  "rule": {
+    "L": { "nodes": ["…"], "edges": [{ "id": "…", "source": "…", "target": "…" }] },
+    "K": { "nodes": ["…"], "edges": [{ "id": "…", "source": "…", "target": "…" }] },
+    "R": { "nodes": ["…"], "edges": [{ "id": "…", "source": "…", "target": "…" }] }
+  },
+  "match": {
+    "nodes": { "<id z L>": "<id w G>" },
+    "edges": { "<id krawędzi z L>": "<id krawędzi w G>" }
+  }
+}
+```
+
+Wymagania:
+
+| Element | Opis |
+|---|---|
+| graf (`graph`, `L`, `K`, `R`) | `nodes`: unikalne niepuste stringi; `edges`: unikalne `id`, `source`/`target` muszą istnieć w `nodes` |
+| `rule.K` | każdy wierzchołek i krawędź z `K` musi występować w `L` i `R` z tymi samymi końcami |
+| `match.nodes` / `match.edges` | dokładnie wszystkie id z `L`, wartości różne i istniejące w `G`; dopasowanie krawędzi zachowuje źródło i cel |
+
 ## Jak działa reguła
 
-- `graph` to graf wejściowy \(G\). Każdy graf ma `nodes`, czyli listę tekstowych identyfikatorów, oraz `edges`, czyli listę obiektów `id`, `source`, `target`.
+- `graph` to graf wejściowy \(G\).
 - `rule.L` opisuje szukany fragment, `rule.K` elementy zachowane, a `rule.R` fragment po zmianie. Elementy zachowane mają te same identyfikatory w `K`, `L` i `R`. Element spoza `K` jest traktowany jako osobny element po każdej stronie reguły.
-- `match.nodes` i `match.edges` mapują osobno wszystkie identyfikatory z `L` na identyfikatory w `G`. Mapowania są różnowartościowe, a dopasowanie krawędzi zachowuje źródło i cel.
+- `match` mapuje identyfikatory z `L` na identyfikatory w `G`.
 - Program sprawdza, czy usunięcie elementów z \(L \setminus K\) pozostawiłoby krawędź bez końca. Jeśli tak, zwraca `dangling_edge` oraz identyfikator tej krawędzi. W przeciwnym razie tworzy graf pośredni `intermediate_graph` i dołącza elementy z \(R \setminus K\) przez zachowaną część, tworząc `result_graph`.
 
 Przykład `slide8.json` odwzorowuje skierowane krawędzie z ostatniego slajdu „SPO I DPO”. Program usuwa `E` wraz z `D → E` i `F → E` oraz usuwa `D → F`. Zachowuje `D` i `F` z ich pozostałymi połączeniami, po czym dodaje `M`, `N` i pięć krawędzi z `R`. Litery z rysunku służą jako identyfikatory. W `slide8_rejected.json` dodatkowa krawędź `E → C` blokuje tę samą regułę.
+
+## Schemat JSON (wynik)
+
+Przy sukcesie (`status: "applied"`):
+
+```json
+{
+  "status": "applied",
+  "intermediate_graph": { "nodes": ["…"], "edges": [{ "id": "…", "source": "…", "target": "…" }] },
+  "result_graph": { "nodes": ["…"], "edges": [{ "id": "…", "source": "…", "target": "…" }] }
+}
+```
+
+Przy odrzuceniu (`status: "rejected"`):
+
+```json
+{
+  "status": "rejected",
+  "reason": "dangling_edge",
+  "edge_id": "…"
+}
+```
 
 ## Gdzie jest kod
 
