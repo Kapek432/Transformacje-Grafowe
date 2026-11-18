@@ -1,10 +1,11 @@
-import { AppShell, Tabs, Text, useComputedColorScheme } from "@mantine/core";
+import { AppShell, Tabs, useComputedColorScheme } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconArrowsShuffle, IconPencil } from "@tabler/icons-react";
 import { useEffect, useReducer, useState } from "react";
 import { api, downloadBlob, EXPORT_FILENAMES, type ExportFormat } from "./api";
 import { EditorTab } from "./components/EditorTab";
 import { TopBar } from "./components/TopBar";
+import { TransformTab } from "./components/TransformTab";
 import { documentReducer, emptyDocument } from "./lib/document";
 import type { DpoDocument } from "./lib/types";
 
@@ -83,7 +84,7 @@ export default function App() {
             <EditorTab doc={doc} dispatch={dispatch} dark={dark} fitKey={String(fitKey)} />
           </Tabs.Panel>
           <Tabs.Panel value="transform">
-            <Text c="dimmed">Widok transformacji powstaje w kolejnym zadaniu.</Text>
+            <TransformTab doc={doc} dispatch={dispatch} dark={dark} />
           </Tabs.Panel>
         </Tabs>
       </AppShell.Main>
