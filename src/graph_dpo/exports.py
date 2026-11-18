@@ -1,12 +1,22 @@
 import csv
+import io
 import json
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Literal
 
 from openpyxl import Workbook
 
 from .models import Applied, GraphData, Rejected
+
+ExportFormat = Literal["json", "csv", "excel"]
+EXPORT_FILENAMES: dict[ExportFormat, str] = {
+    "json": "output.json",
+    "csv": "wynik.zip",
+    "excel": "wynik.xlsx",
+}
 
 
 @dataclass
@@ -57,17 +67,19 @@ def _csv_text(value: str) -> str:
     return "'" + value if value.lstrip().startswith(("=", "+", "-", "@")) else value
 
 
-def _write_csv(directory: Path, tables: list[Table]) -> None:
-    for table in tables:
-        with (directory / table.filename).open(
-            "w", encoding="utf-8-sig", newline=""
-        ) as file:
-            writer = csv.writer(file, delimiter=";")
-            writer.writerow(table.headers)
-            writer.writerows([_csv_text(value) for value in row] for row in table.rows)
+def _json_bytes(result: Applied | Rejected) -> bytes:
+    return (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
 
 
-def _write_excel(path: Path, tables: list[Table]) -> None:
+def _csv_bytes(table: Table) -> bytes:
+    buffer = io.StringIO(newline="")
+    writer = csv.writer(buffer, delimiter=";")
+    writer.writerow(table.headers)
+    writer.writerows([_csv_text(value) for value in row] for row in table.rows)
+    return buffer.getvalue().encode("utf-8-sig")
+
+
+def _excel_bytes(tables: list[Table]) -> bytes:
     workbook = Workbook()
     workbook.remove(workbook.active)
     for table in tables:
@@ -78,7 +90,37 @@ def _write_excel(path: Path, tables: list[Table]) -> None:
                 sheet.cell(row=row_number, column=column, value=value).data_type = "s"
         sheet.freeze_panes = "A2"
         sheet.auto_filter.ref = sheet.dimensions
-    workbook.save(path)
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def _zip_bytes(tables: list[Table]) -> bytes:
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for table in tables:
+            archive.writestr(table.filename, _csv_bytes(table))
+    return buffer.getvalue()
+
+
+def export_bytes(
+    host: GraphData, result: Applied | Rejected, fmt: ExportFormat
+) -> bytes:
+    """Render the transformation result as the content of a downloadable file.
+
+    Args:
+        host: The normalized input graph.
+        result: The transformation result.
+        fmt: "json" for output.json, "csv" for a zip with three tables,
+            "excel" for wynik.xlsx.
+
+    Returns:
+        The file content.
+    """
+    if fmt == "json":
+        return _json_bytes(result)
+    tables = _tables(host, result)
+    return _zip_bytes(tables) if fmt == "csv" else _excel_bytes(tables)
 
 
 def write_outputs(
@@ -106,13 +148,12 @@ def write_outputs(
     # Generate all requested formats before replacing the results of a previous run.
     with TemporaryDirectory(dir=directory) as staging:
         temporary = Path(staging)
-        (temporary / "output.json").write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
+        (temporary / "output.json").write_bytes(_json_bytes(result))
         if csv_export:
-            _write_csv(temporary, tables)
+            for table in tables:
+                (temporary / table.filename).write_bytes(_csv_bytes(table))
         if excel_export:
-            _write_excel(temporary / "wynik.xlsx", tables)
+            (temporary / "wynik.xlsx").write_bytes(_excel_bytes(tables))
         for name in filenames:
             (temporary / name).replace(directory / name)
     return directory / "output.json"
