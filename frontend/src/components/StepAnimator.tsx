@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { STEPS, stepHighlight } from "../lib/steps";
 import type { GraphData, IdSets, Position } from "../lib/types";
 import { GraphCanvas } from "./GraphCanvas";
-import { Legend } from "./Legend";
 
 const STEP_DELAY_MS = 1600;
 
@@ -74,9 +73,6 @@ export function StepAnimator({ union, positions, matched, removed, added, dark }
         dark={dark}
         height={480}
       />
-      <Group mt="sm">
-        <Legend items={["matched", "removed", "added"]} />
-      </Group>
     </Card>
   );
 }

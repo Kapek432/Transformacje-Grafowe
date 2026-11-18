@@ -1,6 +1,6 @@
 import { Alert, Card, Grid, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useEffect, useMemo, useState, type Dispatch } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch } from "react";
 import { api } from "../api";
 import type { DocumentAction } from "../lib/document";
 import { danglingExplanation } from "../lib/explain";
@@ -49,23 +49,33 @@ export function TransformTab({ doc, dispatch, dark }: Props) {
   const [applied, setApplied] = useState<ApplyResponse | null>(null);
   const [view, setView] = useState("side");
   const ruleKey = JSON.stringify([doc.graph, doc.rule]);
+  // Responses can arrive out of order, so only the latest apply request may update the view.
+  const applyRequest = useRef(0);
 
   const choose = (match: MatchInfo, index: number) => {
     const chosen: MatchData = { nodes: match.nodes, edges: match.edges };
+    const request = ++applyRequest.current;
     setSelected(index);
     setApplied(null);
     dispatch({ type: "setMatch", match: chosen });
     api
       .apply({ graph: doc.graph, rule: doc.rule, match: chosen })
-      .then(setApplied)
-      .catch((exception) =>
-        notifications.show({ color: "red", title: "Nie zastosowano reguły", message: (exception as Error).message }),
-      );
+      .then((response) => {
+        if (request === applyRequest.current) setApplied(response);
+      })
+      .catch((exception) => {
+        if (request !== applyRequest.current) return;
+        setSelected(null);
+        notifications.show({ color: "red", title: "Nie zastosowano reguły", message: (exception as Error).message });
+      });
   };
 
+  // Refetching only on graph or rule changes keeps setMatch and layout edits from triggering a loop.
   useEffect(() => {
+    applyRequest.current += 1;
     setMatches(null);
     setSelected(null);
+    setHovered(null);
     setApplied(null);
     setError(null);
     if (validateDocument(doc).length > 0) {
