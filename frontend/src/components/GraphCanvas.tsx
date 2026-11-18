@@ -152,9 +152,10 @@ export function GraphCanvas(props: GraphCanvasProps) {
   useEffect(() => {
     const eh = ehRef.current;
     if (!eh) return;
-    if (editable && drawEdges) eh.enableDrawMode();
-    else eh.disableDrawMode();
+    // Draw mode saves and restores the ungrabify state itself, so it must be toggled around our own setting.
+    eh.disableDrawMode();
     cyRef.current?.autoungrabify(!editable);
+    if (editable && drawEdges) eh.enableDrawMode();
   }, [editable, drawEdges]);
 
   const autoLayout = () => {

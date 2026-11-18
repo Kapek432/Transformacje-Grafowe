@@ -57,12 +57,14 @@ export function TopBar(props: Props) {
           <ThemeIcon variant="gradient" size="lg" radius="md">
             <IconTopologyStar3 size={20} />
           </ThemeIcon>
-          <div>
-            <Title order={4}>Transformacje grafowe DPO</Title>
+          <Stack gap={0} visibleFrom="lg">
+            <Title order={4} style={{ whiteSpace: "nowrap" }}>
+              Transformacje grafowe DPO
+            </Title>
             <Text size="xs" c="dimmed">
               Double Pushout krok po kroku
             </Text>
-          </div>
+          </Stack>
         </Group>
         <Group gap="xs" wrap="nowrap">
           <Select

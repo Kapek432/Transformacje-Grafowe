@@ -44,7 +44,8 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
     const graph = graphByName(doc, selection.graph);
     const nodes = selection.kind === "node" ? [selection.id] : [];
     const edges = selection.kind === "edge" ? [selection.id] : [];
-    edit(selection.graph, removeElements(graph, nodes, edges));
+    const { [selection.id]: _removed, ...positions } = positionsOf(selection.graph);
+    edit(selection.graph, removeElements(graph, nodes, edges), selection.kind === "node" ? positions : undefined);
     setSelection(null);
   };
 
