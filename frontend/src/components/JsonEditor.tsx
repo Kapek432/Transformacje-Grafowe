@@ -23,6 +23,7 @@ export function JsonEditor({ doc, dark, onChange }: Props) {
       setText(serialized);
       setError(null);
     }
+    lastSent.current = null;
   }, [serialized]);
 
   const handleChange = (value: string) => {

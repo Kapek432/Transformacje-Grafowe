@@ -18,9 +18,18 @@ interface Props {
   fitKey: string;
 }
 
+function selectionExists(doc: DpoDocument, selection: EditorSelection): boolean {
+  const graph = graphByName(doc, selection.graph);
+  return selection.kind === "node"
+    ? graph.nodes.includes(selection.id)
+    : graph.edges.some((edge) => edge.id === selection.id);
+}
+
 export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
-  const [selection, setSelection] = useState<EditorSelection | null>(null);
+  const [picked, setSelection] = useState<EditorSelection | null>(null);
   const [drawEdges, setDrawEdges] = useState(false);
+  // JSON edits, loads and "Skopiuj L do R" can remove the picked element behind the panel's back.
+  const selection = picked && selectionExists(doc, picked) ? picked : null;
   const issues = useMemo(() => validateDocument(doc), [doc]);
   const interfaceIds = { nodes: doc.rule.K.nodes, edges: doc.rule.K.edges.map((edge) => edge.id) };
 
@@ -39,15 +48,16 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
     }
   };
 
-  const deleteSelection = () => {
-    if (!selection) return;
-    const graph = graphByName(doc, selection.graph);
-    const nodes = selection.kind === "node" ? [selection.id] : [];
-    const edges = selection.kind === "edge" ? [selection.id] : [];
-    const { [selection.id]: _removed, ...positions } = positionsOf(selection.graph);
-    edit(selection.graph, removeElements(graph, nodes, edges), selection.kind === "node" ? positions : undefined);
-    setSelection(null);
-  };
+  const deleteSelection = () =>
+    guarded(() => {
+      if (!selection) return;
+      const graph = graphByName(doc, selection.graph);
+      const nodes = selection.kind === "node" ? [selection.id] : [];
+      const edges = selection.kind === "edge" ? [selection.id] : [];
+      const { [selection.id]: _removed, ...positions } = positionsOf(selection.graph);
+      edit(selection.graph, removeElements(graph, nodes, edges), selection.kind === "node" ? positions : undefined);
+      setSelection(null);
+    });
 
   const rename = (to: string) =>
     guarded(() => {
@@ -83,6 +93,7 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
         editable
         drawEdges={drawEdges}
         fitKey={fitKey}
+        selected={selection?.graph === name ? selection : null}
         onAddNode={(position) =>
           guarded(() => {
             const graph = graphByName(doc, name);
@@ -97,7 +108,7 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
           setSelection((current) => (picked ? { graph: name, ...picked } : current?.graph === name ? null : current))
         }
         onPositionsChange={(positions) => dispatch({ type: "setPositions", name, positions })}
-        onDeleteKey={deleteSelection}
+        onDeleteKey={() => selection?.graph === name && deleteSelection()}
       />
     </Card>
   );

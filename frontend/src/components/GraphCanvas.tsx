@@ -9,7 +9,7 @@ import cytoscape, {
 } from "cytoscape";
 import edgehandles from "cytoscape-edgehandles";
 import { useEffect, useRef } from "react";
-import { elementClasses, toElements, type Highlight } from "../lib/toCytoscape";
+import { edgeKey, elementClasses, nodeKey, toElements, type Highlight } from "../lib/toCytoscape";
 import type { GraphData, Position } from "../lib/types";
 import { graphStyle } from "./graphStyle";
 
@@ -29,6 +29,7 @@ export interface GraphCanvasProps {
   editable?: boolean;
   drawEdges?: boolean;
   fitKey?: string;
+  selected?: CanvasSelection | null;
   onAddNode?: (position: Position) => void;
   onAddEdge?: (source: string, target: string) => void;
   onSelect?: (selection: CanvasSelection | null) => void;
@@ -80,7 +81,17 @@ function syncElements(cy: Core, elements: ElementDefinition[]): void {
 }
 
 export function GraphCanvas(props: GraphCanvasProps) {
-  const { graph, positions, highlight = {}, dark, height = 320, editable = false, drawEdges = false, fitKey } = props;
+  const {
+    graph,
+    positions,
+    highlight = {},
+    dark,
+    height = 320,
+    editable = false,
+    drawEdges = false,
+    fitKey,
+    selected = null,
+  } = props;
   const container = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
   const ehRef = useRef<ReturnType<Core["edgehandles"]> | null>(null);
@@ -118,6 +129,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
       eh.destroy();
       cy.destroy();
       cyRef.current = null;
+      lastFit.current = undefined;
     };
   }, []);
 
@@ -131,11 +143,22 @@ export function GraphCanvas(props: GraphCanvasProps) {
     if (!cy) return;
     syncElements(cy, toElements(graph, positions, latest.current.highlight ?? {}));
     const key = fitKey ?? "";
-    if (lastFit.current !== key) {
+    // An empty graph cannot be fitted, so the fit waits for the first elements.
+    if (lastFit.current !== key && cy.elements().nonempty()) {
       fitView(cy);
       lastFit.current = key;
     }
   }, [structureKey, fitKey]);
+
+  const selectedKey = selected ? (selected.kind === "node" ? nodeKey(selected.id) : edgeKey(selected.id)) : null;
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.$(":selected")
+      .filter((element) => element.id() !== selectedKey)
+      .unselect();
+    if (selectedKey) cy.getElementById(selectedKey).select();
+  }, [selectedKey, structureKey]);
 
   const highlightKey = JSON.stringify(highlight);
   useEffect(() => {
