@@ -24,6 +24,13 @@ describe("deriveInterface", () => {
     });
   });
 
+  it("drops shared edges whose ends are not in K", () => {
+    const L = { nodes: ["a"], edges: [{ id: "x", source: "a", target: "b" }] };
+    const R = { nodes: ["a"], edges: [{ id: "x", source: "a", target: "b" }] };
+
+    expect(deriveInterface(L, R).K).toEqual({ nodes: ["a"], edges: [] });
+  });
+
   it("reports an edge id used with different ends", () => {
     const L = { nodes: ["a", "b"], edges: [{ id: "x", source: "a", target: "b" }] };
     const R = { nodes: ["a", "b"], edges: [{ id: "x", source: "b", target: "a" }] };

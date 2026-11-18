@@ -3,10 +3,37 @@ import { emptyGraph, type DpoDocument, type GraphData, type Layout, type MatchDa
 function isGraph(value: unknown): value is GraphData {
   if (typeof value !== "object" || value === null) return false;
   const graph = value as Record<string, unknown>;
-  return Array.isArray(graph.nodes) && Array.isArray(graph.edges);
+  return (
+    Array.isArray(graph.nodes) &&
+    graph.nodes.every((node) => typeof node === "string") &&
+    Array.isArray(graph.edges) &&
+    graph.edges.every((edge) => {
+      if (typeof edge !== "object" || edge === null) return false;
+      const { id, source, target } = edge as Record<string, unknown>;
+      return typeof id === "string" && typeof source === "string" && typeof target === "string";
+    })
+  );
 }
 
-/** Checks only the document shape; element-level errors are reported by validateDocument. */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseMatch(value: unknown): MatchData | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!isPlainObject(value) || !isPlainObject(value.nodes) || !isPlainObject(value.edges)) {
+    throw new Error("Pole match musi zawierać obiekty nodes i edges.");
+  }
+  return value as unknown as MatchData;
+}
+
+function parseLayout(value: unknown): Layout {
+  if (value === undefined || value === null) return {};
+  if (!isPlainObject(value)) throw new Error("Pole layout musi być obiektem.");
+  return value as Layout;
+}
+
+/** Checks the document shape, element types and optional fields; semantic errors (duplicates, missing ends) are reported by validateDocument. */
 export function parseDocument(text: string): DpoDocument {
   let value: unknown;
   try {
@@ -28,7 +55,7 @@ export function parseDocument(text: string): DpoDocument {
   return {
     graph: doc.graph,
     rule: { L: rule.L, K: isGraph(rule.K) ? rule.K : emptyGraph(), R: rule.R },
-    match: doc.match as MatchData | undefined,
-    layout: (doc.layout as Layout | undefined) ?? {},
+    match: parseMatch(doc.match),
+    layout: parseLayout(doc.layout),
   };
 }

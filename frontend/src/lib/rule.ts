@@ -20,5 +20,11 @@ export function deriveInterface(left: GraphData, right: GraphData): InterfaceRes
       conflicts.push(edge.id);
     }
   }
-  return { K: { nodes: left.nodes.filter((node) => rightNodes.has(node)), edges }, conflicts };
+  const nodes = left.nodes.filter((node) => rightNodes.has(node));
+  const kept = new Set(nodes);
+  // An edge whose end is missing from L or R cannot belong to K.
+  return {
+    K: { nodes, edges: edges.filter((edge) => kept.has(edge.source) && kept.has(edge.target)) },
+    conflicts,
+  };
 }
