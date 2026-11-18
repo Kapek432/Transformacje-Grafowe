@@ -11,6 +11,16 @@ from fastapi.testclient import TestClient
 from graph_dpo.api import create_app
 
 PROJECT = Path(__file__).resolve().parents[1]
+EXPECTED_EXAMPLES = [
+    "parallel_edges",
+    "remove_leaf",
+    "remove_loop",
+    "remove_vertex_rejected",
+    "reverse_edge",
+    "slide8",
+    "slide8_rejected",
+    "subdivide_edge",
+]
 
 
 def _example(name: str) -> dict[str, Any]:
@@ -31,7 +41,7 @@ def client(examples: Path) -> TestClient:
 
 
 def test_lists_and_reads_examples(client: TestClient) -> None:
-    assert client.get("/api/examples").json() == ["slide8", "slide8_rejected"]
+    assert client.get("/api/examples").json() == EXPECTED_EXAMPLES
     assert client.get("/api/examples/slide8").json() == _example("slide8")
     assert client.get("/api/examples/brak").status_code == 404
     assert client.get("/api/examples/zla.nazwa").status_code == 400
@@ -163,4 +173,4 @@ def test_invalid_document_is_checked_before_overwrite_conflict(
 def test_lists_only_valid_example_names(client: TestClient, examples: Path) -> None:
     (examples / "bad name.json").write_text("{}", encoding="utf-8")
 
-    assert client.get("/api/examples").json() == ["slide8", "slide8_rejected"]
+    assert client.get("/api/examples").json() == EXPECTED_EXAMPLES

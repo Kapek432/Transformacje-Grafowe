@@ -1,0 +1,54 @@
+{
+  "graph": {
+    "nodes": [
+      "A",
+      "B"
+    ],
+    "edges": [
+      {
+        "id": "aa",
+        "source": "A",
+        "target": "A"
+      },
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x"
+      ],
+      "edges": [
+        {
+          "id": "loop",
+          "source": "x",
+          "target": "x"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "x"
+      ],
+      "edges": []
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "A"
+    },
+    "edges": {
+      "loop": "aa"
+    }
+  }
+}

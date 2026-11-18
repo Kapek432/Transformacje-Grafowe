@@ -32,6 +32,42 @@ Zakładka „Transformacja” wyszukuje wszystkie injektywne dopasowania L w G (
 
 Praca nad frontendem z automatycznym przeładowaniem: `uv run dpo-ui --no-browser` w jednym terminalu i `npm run dev` w `frontend/` w drugim.
 
+### Podgląd aplikacji
+
+Edytor grafu G i reguły L ← K → R z podglądem JSON:
+
+![Edytor grafu i reguły DPO](assets/screenshots/editor.jpg)
+
+Transformacja przykładu `slide8`: dopasowanie, elementy usuwane i dodane oraz grafy G, D i H:
+
+![Grafy G, D i H po zastosowaniu reguły](assets/screenshots/transformation.jpg)
+
+Odrzucone usunięcie wierzchołka B: krawędź `bc` pozostałaby bez końca. Drugie dopasowanie tej samej reguły jest dozwolone:
+
+![Odrzucone dopasowanie i wyjaśnienie warunku wiszącej krawędzi](assets/screenshots/rejected.jpg)
+
+## Gotowe przykłady
+
+Wybierz nazwę z listy w UI albo uruchom plik przez CLI. Każdy przykład zawiera gotowe `match`; wynik opisany poniżej dotyczy właśnie tego dopasowania. W UI możesz wybrać również inne znalezione dopasowania.
+
+- [subdivide_edge.json](examples/subdivide_edge.json) - zastępuje A → B ścieżką A → m → B; zachowuje końce krawędzi i pozostałą część grafu.
+- [reverse_edge.json](examples/reverse_edge.json) - usuwa A → B i dodaje B → A bez usuwania wierzchołków.
+- [parallel_edges.json](examples/parallel_edges.json) - dwie równoległe krawędzie A → B dają dwa dopasowania. Wybrana krawędź zostaje odwrócona, druga pozostaje.
+- [remove_loop.json](examples/remove_loop.json) - usuwa pętlę A → A, zachowując A oraz krawędź A → B.
+- [remove_leaf.json](examples/remove_leaf.json) - usuwa końcowy wierzchołek C wraz z B → C; warunek wiszącej krawędzi jest spełniony.
+- [remove_vertex_rejected.json](examples/remove_vertex_rejected.json) - próba usunięcia B wraz z A → B jest odrzucona przez pozostającą B → C (`bc`). Wybór drugiego dopasowania pozwala zamiast tego usunąć C.
+- [slide8.json](examples/slide8.json) - większy przykład z materiałów: usuwanie fragmentu grafu i dodawanie nowych wierzchołków oraz krawędzi.
+- [slide8_rejected.json](examples/slide8_rejected.json) - wariant poprzedniego przykładu, w którym dodatkowa krawędź E → C blokuje zapisane dopasowanie.
+
+Na przykład:
+
+```sh
+uv run python dpo.py examples/subdivide_edge.json --output-dir wynik/podzial
+uv run python dpo.py examples/remove_vertex_rejected.json --output-dir wynik/wiszaca
+```
+
+Druga komenda zapisuje odrzucenie z `edge_id: "bc"` i zwraca kod wyjścia `3`.
+
 ## Schemat JSON (wejście)
 
 Plik wejściowy to jeden obiekt z polami `graph`, `rule` i `match`:
