@@ -1,0 +1,41 @@
+{
+  "graph": {
+    "nodes": ["C", "D", "E", "F", "G", "H", "I"],
+    "edges": [
+      {"id": "D-C", "source": "D", "target": "C"},
+      {"id": "D-E", "source": "D", "target": "E"},
+      {"id": "D-F", "source": "D", "target": "F"},
+      {"id": "F-E", "source": "F", "target": "E"},
+      {"id": "F-I", "source": "F", "target": "I"},
+      {"id": "G-F", "source": "G", "target": "F"},
+      {"id": "H-D", "source": "H", "target": "D"},
+      {"id": "H-G", "source": "H", "target": "G"},
+      {"id": "E-C", "source": "E", "target": "C"}
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": ["D", "E", "F"],
+      "edges": [
+        {"id": "left-D-E", "source": "D", "target": "E"},
+        {"id": "left-D-F", "source": "D", "target": "F"},
+        {"id": "left-F-E", "source": "F", "target": "E"}
+      ]
+    },
+    "K": {"nodes": ["D", "F"], "edges": []},
+    "R": {
+      "nodes": ["D", "F", "M", "N"],
+      "edges": [
+        {"id": "D-N", "source": "D", "target": "N"},
+        {"id": "F-N", "source": "F", "target": "N"},
+        {"id": "N-M", "source": "N", "target": "M"},
+        {"id": "M-D", "source": "M", "target": "D"},
+        {"id": "M-F", "source": "M", "target": "F"}
+      ]
+    }
+  },
+  "match": {
+    "nodes": {"D": "D", "E": "E", "F": "F"},
+    "edges": {"left-D-E": "D-E", "left-D-F": "D-F", "left-F-E": "F-E"}
+  }
+}
