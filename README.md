@@ -66,7 +66,7 @@ Odrzucone usunięcie wierzchołka B: krawędź `bc` pozostałaby bez końca. Dru
 
 ## Gotowe przykłady
 
-W katalogu `examples/` jest 25 przykładów dostępnych z listy w UI. [Pełny katalog przykładów](PRZYKLADY.md) opisuje każdy plik: regułę, zawartość K, liczbę dopasowań oraz elementy zachowywane, usuwane i dodawane dla zapisanego `match`.
+W katalogu `examples/` jest 31 przykładów dostępnych z listy w UI. [Pełny katalog przykładów](PRZYKLADY.md) opisuje każdy plik: regułę, zawartość K, liczbę dopasowań oraz elementy zachowywane, usuwane i dodawane dla zapisanego `match`.
 
 Po dodaniu plików przy już otwartej aplikacji odśwież stronę. Wybierz przykład z listy albo uruchom go przez CLI:
 
@@ -76,6 +76,23 @@ uv run python dpo.py examples/k_path_branch_rejected.json --output-dir wynik/odr
 ```
 
 Druga komenda zapisuje odrzucenie z `edge_id: "old-sink"` i zwraca kod wyjścia `3`.
+
+## Przypadki brzegowe
+
+Poniższe sytuacje mają z góry określony wynik i testy sprawdzające dokładne id węzłów, id krawędzi oraz ich końce w D i H. Odrzucenie transformacji jest poprawnym wynikiem, jeśli usunięcie pozostawiłoby krawędź bez końca.
+
+- **Dodatkowa krawędź równoległa:** w [edge_parallel_delete_rejected.json](examples/edge_parallel_delete_rejected.json) G zawiera dwie krawędzie A → B, lecz L obejmuje tylko `p1` i usuwa B. Oczekiwane: odrzucenie przez pozostającą `p2`. W [wariancie obejmującym obie krawędzie](examples/edge_parallel_delete.json) obie są usuwane wraz z B, a H zawiera wyłącznie A.
+- **Różne id zachowanej krawędzi:** w [explicit_morphisms.json](examples/explicit_morphisms.json) K[ke] przechodzi na L[left-edge], dalej na G[ab], a przez r na R[right-edge]. Oczekiwane: w D i H pozostaje oryginalna `ab: A → B`, bez jej duplikowania pod nazwą z K lub R.
+- **Puste K i takie same id w L oraz R:** w [empty_interface_replace.json](examples/empty_interface_replace.json) węzeł `x` nie należy do zachowanego interfejsu. Oczekiwane: D jest pusty, a H ma nowy węzeł `x_1` z niezmienioną etykietą A. Zgodność id między L i R nie zastępuje morfizmów K.
+- **Kolizje nazw nowych elementów:** w [name_collisions.json](examples/name_collisions.json) istnieją już `relay`, `relay_1`, `relay_2` oraz nazwy dodawanych krawędzi. Oczekiwane: powstają `relay_3`, `to-relay_2` i `from-relay_1`. Istniejące elementy pozostają zachowane, a obie nowe krawędzie wskazują właściwy `relay_3`.
+
+Odrzucenie jest oczekiwane: pominięta krawędź `p2` blokuje usunięcie B.
+
+![Przypadek brzegowy - dodatkowa krawędź równoległa blokuje usunięcie węzła](assets/screenshots/edge-parallel-rejected.jpg)
+
+[Pełny katalog](PRZYKLADY.md#przypadki-brzegowe) zawiera też parę przykładów z pętlą, tworzenie grafu z pustego wejścia, usunięcie całego grafu i celowo błędny morfizm. Błędny plik jest w `tests/fixtures/`, poza listą poprawnych przykładów; można go wgrać do edytora, aby zobaczyć błąd walidacji.
+
+[Testy przypadków brzegowych](tests/test_edge_cases.py) porównują dokładne wyniki silnika, API i CLI. Dodatkowo [niezależny test wyszukiwania dopasowań](tests/test_matching_oracle.py) porównuje wynik z przeglądem wszystkich injektywnych odwzorowań dla 120 kombinacji małych grafów i wzorców, w tym pętli, krawędzi równoległych i cyklu.
 
 ## Schemat JSON (wejście)
 

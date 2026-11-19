@@ -1,0 +1,74 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "A",
+        "label": "A"
+      }
+    ],
+    "edges": [
+      {
+        "id": "aa",
+        "source": "A",
+        "target": "A"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        {
+          "id": "x",
+          "label": "x"
+        }
+      ],
+      "edges": [
+        {
+          "id": "xx",
+          "source": "x",
+          "target": "x"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [],
+      "edges": []
+    },
+    "R": {
+      "nodes": [],
+      "edges": []
+    },
+    "l": {
+      "nodes": {},
+      "edges": {}
+    },
+    "r": {
+      "nodes": {},
+      "edges": {}
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "A"
+    },
+    "edges": {
+      "xx": "aa"
+    }
+  },
+  "layout": {
+    "G": {
+      "A": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "L": {
+      "x": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "K": {},
+    "R": {}
+  }
+}

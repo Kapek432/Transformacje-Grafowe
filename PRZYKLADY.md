@@ -1,6 +1,6 @@
 # Katalog przykładów DPO
 
-Każdy przykład jest dostępny z listy w UI i jako plik JSON w `examples/`. Poniższe wyniki dotyczą dopasowania `match` zapisanego w pliku; w UI można wybrać inne. Liczymy osobne morfizmy L → G, więc symetria może dawać kilka dopasowań tego samego fragmentu. Etykiety są wyłącznie tekstem na rysunku.
+Poprawne przykłady z `examples/` są dostępne z listy w UI. Osobny, celowo błędny plik z `tests/fixtures/` opisano na końcu; można go wgrać ręcznie do edytora. Poniższe wyniki dotyczą dopasowania `match` zapisanego w pliku; w UI można wybrać inne. Liczymy osobne morfizmy L → G, więc symetria może dawać kilka dopasowań tego samego fragmentu. Etykiety są wyłącznie tekstem na rysunku.
 
 L, K i R są niezależnymi grafami z jawnymi morfizmami l: K → L oraz r: K → R. K opisuje zachowywany fragment, usuwamy elementy L spoza l(K), a dodajemy elementy R spoza r(K). Id wynikowych elementów zachowanych pochodzą z G; id nowych elementów mogą dostać sufiks przy kolizji nazw.
 
@@ -320,3 +320,43 @@ Zastępuje A → B ścieżką A → m → B; zachowuje końce krawędzi i pozost
 - Usuwane węzły: brak. Usuwane krawędzie: `ab` (A → B).
 - Nowe węzły: `m`. Nowe krawędzie: `xm` (A → m), `my` (m → B).
 - Wynik: zastosowanie (`applied`). D: węzły - 3, krawędzie - 1. H: węzły - 4, krawędzie - 3.
+
+## Przypadki brzegowe
+
+Poniższe pary izolują warunek wiszącej krawędzi oraz obsługę pustych grafów. Każdy poprawny plik ma jawne id/label, osobno zdefiniowane K i morfizmy l oraz r. [Testy](tests/test_edge_cases.py) sprawdzają pełny wynik przez silnik, API i CLI, a nie tylko status zastosowania.
+
+### [edge_parallel_delete_rejected](examples/edge_parallel_delete_rejected.json)
+
+G ma węzły A, B i dwie równoległe krawędzie `p1`, `p2` z A do B. L obejmuje tylko krawędź dopasowaną do `p1`. K zachowuje A, a reguła próbuje usunąć B. Pozostająca `p2` miałaby nieistniejący koniec, więc zapisane dopasowanie daje `rejected`, `dangling_edge`, `edge_id: "p2"`. Są 2 dopasowania i oba są zablokowane. D i H nie powstają.
+
+### [edge_parallel_delete](examples/edge_parallel_delete.json)
+
+G jest taki sam jak w poprzednim przykładzie, ale L obejmuje obie krawędzie równoległe. K nadal zachowuje tylko A. Teraz usuwamy B, `p1` i `p2`, więc D i H mają dokładnie węzeł `{"id": "A", "label": "A"}` i żadnej krawędzi. Są 2 dopasowania wynikające z zamiany krawędzi; oba są dozwolone i dają ten sam wynik.
+
+### [edge_loop_delete_rejected](examples/edge_loop_delete_rejected.json)
+
+G zawiera A → B (`ab`) oraz pętlę B → B (`loop-b`). L obejmuje tylko A → B, a K zachowuje A. Usunięcie B bez usunięcia jego pętli jest niedozwolone. Jedyne dopasowanie daje `rejected`, `dangling_edge`, `edge_id: "loop-b"`.
+
+### [edge_loop_delete](examples/edge_loop_delete.json)
+
+L obejmuje A → B oraz pętlę B → B. Wraz z B usuwane są obie jego krawędzie. Jedyne dopasowanie jest dozwolone: D i H zawierają dokładnie A, z zachowanym id i etykietą, oraz pustą listę krawędzi. To wariant udany poprzedniego przypadku.
+
+### [edge_empty_create](examples/edge_empty_create.json)
+
+G, L i K są puste. Istnieje dokładnie jedno dopasowanie: puste odwzorowanie węzłów i krawędzi. R zawiera węzeł A oraz pętlę `aa: A → A`, więc powstają one jako nowe elementy. D jest pusty, H ma dokładnie A i `aa`, a wynik ma status `applied`.
+
+### [edge_delete_all](examples/edge_delete_all.json)
+
+G ma węzeł A i pętlę `aa: A → A`; L obejmuje cały ten graf. K i R są puste, dlatego węzeł i pętla są usuwane razem. Jedyne dopasowanie jest dozwolone. Oczekiwany wynik to `applied` z pustymi listami węzłów i krawędzi zarówno w D, jak i H.
+
+### Tożsamość zachowanych i nowych elementów
+
+- [explicit_morphisms](examples/explicit_morphisms.json): krawędź ma różne id w K, L i R, ale przez morfizmy oznacza zachowanie oryginalnej `ab: A → B` w G. Test porównuje całe D oraz H i wyklucza utworzenie dodatkowej kopii zachowanej krawędzi.
+- [empty_interface_replace](examples/empty_interface_replace.json): wspólne id `x` w L i R przy pustym K oznacza usunięcie starego elementu i utworzenie nowego `x_1`. Test sprawdza także etykietę A nowego węzła.
+- [name_collisions](examples/name_collisions.json): test sprawdza pełny kontekst, nowe id `relay_3`, `to-relay_2`, `from-relay_1` oraz oba końce nowych krawędzi. Istniejące elementy nie są nadpisywane.
+
+### [invalid_morphism_endpoints](tests/fixtures/invalid_morphism_endpoints.json)
+
+To celowo niepoprawne dane wejściowe, przechowywane poza `examples/`. Wszystkie id istnieją, a odwzorowanie węzłów l jest injektywne, lecz zamienia obrazy końców krawędzi: `k1 → left-b`, `k2 → left-a`, podczas gdy `ke → left-edge`, a ta krawędź biegnie od left-a do left-b. Morfizm nie zachowuje więc źródła i celu.
+
+Oczekiwane: walidacja odrzuca regułę przed transformacją. API zwraca `422` dla wyszukiwania, zastosowania i eksportu, CLI kończy się kodem `1` i nie tworzy `output.json`, a w UI po wgraniu pliku pojawia się błąd morfizmu. Nie jest to status `rejected` wynikający z warunku wiszącej krawędzi: tutaj sama reguła jest niepoprawna.

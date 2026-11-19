@@ -1,0 +1,125 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "A"
+      },
+      {
+        "id": "C",
+        "label": "Kontekst"
+      }
+    ],
+    "edges": [
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        {
+          "id": "left-a",
+          "label": "left-a"
+        },
+        {
+          "id": "left-b",
+          "label": "left-b"
+        }
+      ],
+      "edges": [
+        {
+          "id": "left-edge",
+          "source": "left-a",
+          "target": "left-b"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        {
+          "id": "k1",
+          "label": "Zachowany"
+        },
+        {
+          "id": "k2",
+          "label": "Zachowany"
+        }
+      ],
+      "edges": [
+        {
+          "id": "ke",
+          "source": "k1",
+          "target": "k2"
+        }
+      ]
+    },
+    "R": {
+      "nodes": [
+        {
+          "id": "right-a",
+          "label": "right-a"
+        },
+        {
+          "id": "right-b",
+          "label": "right-b"
+        },
+        {
+          "id": "new",
+          "label": "new"
+        }
+      ],
+      "edges": [
+        {
+          "id": "right-edge",
+          "source": "right-a",
+          "target": "right-b"
+        },
+        {
+          "id": "added",
+          "source": "right-b",
+          "target": "new"
+        }
+      ]
+    },
+    "l": {
+      "nodes": {
+        "k1": "left-b",
+        "k2": "left-a"
+      },
+      "edges": {
+        "ke": "left-edge"
+      }
+    },
+    "r": {
+      "nodes": {
+        "k1": "right-a",
+        "k2": "right-b"
+      },
+      "edges": {
+        "ke": "right-edge"
+      }
+    }
+  },
+  "match": {
+    "nodes": {
+      "left-a": "A",
+      "left-b": "B"
+    },
+    "edges": {
+      "left-edge": "ab"
+    }
+  }
+}
