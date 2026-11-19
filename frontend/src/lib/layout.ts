@@ -1,4 +1,4 @@
-import type { GraphData, Position } from "./types";
+import { nodeIds, type GraphData, type Position } from "./types";
 
 const NEIGHBOUR_DISTANCE = 70;
 // The golden angle spreads several new nodes around the same neighbours.
@@ -19,12 +19,13 @@ export function completeLayout(
   graph: GraphData,
   known: Record<string, Position> = {},
 ): Record<string, Position> {
+  const ids = nodeIds(graph);
   const result: Record<string, Position> = {};
-  for (const node of graph.nodes) if (known[node]) result[node] = known[node];
-  const missing = graph.nodes.filter((node) => !result[node]);
-  if (missing.length === graph.nodes.length) return circleLayout(graph.nodes);
+  for (const node of ids) if (known[node]) result[node] = known[node];
+  const missing = ids.filter((node) => !result[node]);
+  if (missing.length === graph.nodes.length) return circleLayout(ids);
 
-  const neighbours = new Map<string, string[]>(graph.nodes.map((node) => [node, []]));
+  const neighbours = new Map<string, string[]>(ids.map((node) => [node, []]));
   for (const edge of graph.edges) {
     neighbours.get(edge.source)?.push(edge.target);
     neighbours.get(edge.target)?.push(edge.source);

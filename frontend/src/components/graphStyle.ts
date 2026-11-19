@@ -2,7 +2,7 @@ import type cytoscape from "cytoscape";
 
 export const COLORS = {
   node: "#4c6ef5",
-  interface: "#7048e8",
+  interface: "#9c36b5",
   matched: "#f08c00",
   removed: "#e03131",
   added: "#2f9e44",
@@ -49,8 +49,15 @@ export function graphStyle(dark: boolean): cytoscape.StylesheetJson {
         "transition-duration": 400,
       },
     },
-    { selector: "node.interface", style: { "border-color": COLORS.interface, "border-width": 4 } },
-    { selector: "edge.interface", style: { "line-color": COLORS.interface, "target-arrow-color": COLORS.interface, width: 3 } },
+    {
+      selector: "node.interface",
+      style: {
+        "background-color": COLORS.interface,
+        "border-color": dark ? "#f3d9fa" : "#4a145d",
+        "border-width": 4,
+      },
+    },
+    { selector: "edge.interface", style: { "line-color": COLORS.interface, "target-arrow-color": COLORS.interface, width: 4 } },
     { selector: "node.matched", style: { "background-color": COLORS.matched } },
     { selector: "edge.matched", style: { "line-color": COLORS.matched, "target-arrow-color": COLORS.matched, width: 3 } },
     { selector: "node.removed", style: { "background-color": COLORS.removed } },

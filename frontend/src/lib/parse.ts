@@ -1,11 +1,12 @@
-import { emptyGraph, type DpoDocument, type GraphData, type Layout, type MatchData } from "./types";
+import { type DpoDocument, type GraphData, type Layout, type MatchData } from "./types";
 
 function isGraph(value: unknown): value is GraphData {
   if (typeof value !== "object" || value === null) return false;
   const graph = value as Record<string, unknown>;
   return (
     Array.isArray(graph.nodes) &&
-    graph.nodes.every((node) => typeof node === "string") &&
+    graph.nodes.every((node) => isPlainObject(node) && typeof node.id === "string" && typeof node.label === "string") &&
+    !Object.hasOwn(graph, "node_labels") &&
     Array.isArray(graph.edges) &&
     graph.edges.every((edge) => {
       if (typeof edge !== "object" || edge === null) return false;
@@ -23,6 +24,14 @@ function parseMatch(value: unknown): MatchData | undefined {
   if (value === undefined || value === null) return undefined;
   if (!isPlainObject(value) || !isPlainObject(value.nodes) || !isPlainObject(value.edges)) {
     throw new Error("Pole match musi zawierać obiekty nodes i edges.");
+  }
+  return value as unknown as MatchData;
+}
+
+function parseMorphism(value: unknown): MatchData {
+  if (!isPlainObject(value) || !isPlainObject(value.nodes) || !isPlainObject(value.edges) ||
+      ![...Object.values(value.nodes), ...Object.values(value.edges)].every((id) => typeof id === "string")) {
+    throw new Error("Morfizm musi zawierać obiekty nodes i edges z identyfikatorami tekstowymi.");
   }
   return value as unknown as MatchData;
 }
@@ -52,9 +61,10 @@ export function parseDocument(text: string): DpoDocument {
   if (typeof rule !== "object" || rule === null || !isGraph(rule.L) || !isGraph(rule.R)) {
     throw new Error("Pole rule musi zawierać grafy L i R z listami nodes i edges.");
   }
+  if (!isGraph(rule.K)) throw new Error("Pole rule.K musi zawierać osobny graf z listami nodes i edges.");
   return {
     graph: doc.graph,
-    rule: { L: rule.L, K: isGraph(rule.K) ? rule.K : emptyGraph(), R: rule.R },
+    rule: { L: rule.L, K: rule.K as GraphData, R: rule.R, ...(rule.l === undefined ? {} : {l: parseMorphism(rule.l)}), ...(rule.r === undefined ? {} : {r: parseMorphism(rule.r)}) },
     match: parseMatch(doc.match),
     layout: parseLayout(doc.layout),
   };

@@ -14,7 +14,9 @@ PROJECT = Path(__file__).resolve().parents[1]
 
 
 def _result() -> tuple[GraphData, Applied | Rejected]:
-    document = json.loads((PROJECT / "examples/slide8.json").read_text(encoding="utf-8"))
+    document = json.loads(
+        (PROJECT / "examples/slide8.json").read_text(encoding="utf-8")
+    )
     return apply_dpo(document)
 
 

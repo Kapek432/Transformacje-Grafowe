@@ -40,8 +40,12 @@ def _tables(host: GraphData, result: Applied | Rejected) -> list[Table]:
         Table(
             "wierzcholki.csv",
             "Wierzchołki",
-            ("etap", "id"),
-            [(name, node) for name, graph in stages for node in graph["nodes"]],
+            ("etap", "id", "etykieta"),
+            [
+                (name, node["id"], node["label"])
+                for name, graph in stages
+                for node in graph["nodes"]
+            ],
         ),
         Table(
             "krawedzie.csv",

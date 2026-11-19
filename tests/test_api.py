@@ -15,6 +15,14 @@ EXPECTED_EXAMPLES = [
     "connect_components",
     "cycle_no_match",
     "diamond_expand",
+    "empty_interface_replace",
+    "explicit_morphisms",
+    "k_cycle_attachment",
+    "k_disconnected_bridge",
+    "k_loop_preserved",
+    "k_parallel_preserved",
+    "k_path_branch",
+    "k_path_branch_rejected",
     "loop_cleanup_network",
     "name_collisions",
     "parallel_bundle",
@@ -24,6 +32,7 @@ EXPECTED_EXAMPLES = [
     "remove_leaf",
     "remove_loop",
     "remove_vertex_rejected",
+    "repeated_labels",
     "reverse_edge",
     "slide8",
     "slide8_rejected",
@@ -91,9 +100,15 @@ def test_matches_report_applicability(client: TestClient) -> None:
 
 
 def test_matches_are_truncated(client: TestClient) -> None:
-    small = {"nodes": ["x", "y"], "edges": []}
+    small = {
+        "nodes": [{"id": "x", "label": "x"}, {"id": "y", "label": "y"}],
+        "edges": [],
+    }
     document = {
-        "graph": {"nodes": [f"v{index}" for index in range(30)], "edges": []},
+        "graph": {
+            "nodes": [{"id": f"v{index}", "label": f"v{index}"} for index in range(30)],
+            "edges": [],
+        },
         "rule": {"L": small, "K": small, "R": small},
     }
 
@@ -188,9 +203,12 @@ def test_lists_only_valid_example_names(client: TestClient, examples: Path) -> N
     ("count", "truncated"), [(199, False), (200, False), (201, True)]
 )
 def test_match_limit_boundary(client: TestClient, count: int, truncated: bool) -> None:
-    singleton = {"nodes": ["x"], "edges": []}
+    singleton = {"nodes": [{"id": "x", "label": "x"}], "edges": []}
     document = {
-        "graph": {"nodes": [f"v{i}" for i in range(count)], "edges": []},
+        "graph": {
+            "nodes": [{"id": f"v{i}", "label": f"v{i}"} for i in range(count)],
+            "edges": [],
+        },
         "rule": {"L": singleton, "K": singleton, "R": singleton},
     }
 

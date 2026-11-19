@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { parseDocument } from "./parse";
 
-const graph = { nodes: ["a"], edges: [] };
+const graph = { nodes: [{"id": "a", "label": "a"}], edges: [] };
 
 describe("parseDocument", () => {
-  it("reads a document and fills missing K and layout", () => {
-    const text = JSON.stringify({ graph, rule: { L: graph, R: graph } });
+  it("reads a document with explicit K and fills layout", () => {
+    const text = JSON.stringify({ graph, rule: { L: graph, K:{nodes:[],edges:[]}, R: graph } });
 
     expect(parseDocument(text)).toEqual({
       graph,
@@ -30,7 +30,7 @@ describe("parseDocument", () => {
   });
 
   it("validates match", () => {
-    const rule = { L: graph, R: graph };
+    const rule = { L: graph, K: graph, R: graph };
     const message = "Pole match musi zawierać obiekty nodes i edges.";
 
     expect(() => parseDocument(JSON.stringify({ graph, rule, match: [] }))).toThrow(message);
@@ -43,7 +43,7 @@ describe("parseDocument", () => {
   });
 
   it("validates layout", () => {
-    const rule = { L: graph, R: graph };
+    const rule = { L: graph, K: graph, R: graph };
     const message = "Pole layout musi być obiektem.";
 
     expect(() => parseDocument(JSON.stringify({ graph, rule, layout: [] }))).toThrow(message);

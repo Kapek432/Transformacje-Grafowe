@@ -1,9 +1,18 @@
 {
   "graph": {
     "nodes": [
-      "A",
-      "B",
-      "C"
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
     ],
     "edges": [
       {
@@ -21,8 +30,14 @@
   "rule": {
     "L": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -34,15 +49,27 @@
     },
     "K": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": []
     },
     "R": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -51,6 +78,20 @@
           "target": "x"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
     }
   },
   "match": {

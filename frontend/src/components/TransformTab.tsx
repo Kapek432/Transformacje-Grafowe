@@ -157,11 +157,13 @@ export function TransformTab({ doc, dispatch, dark }: Props) {
             ]}
             w="fit-content"
           />
-          <Legend items={["matched", "removed", "added"]} />
+          <Legend items={["interface", "matched", "removed", "added"]} />
           {view === "side" ? (
             sideBySide
           ) : resultGraph && applied && doc.match ? (
             <StepAnimator
+              rule={doc.rule}
+              match={doc.match}
               union={union}
               positions={positions}
               matched={matchIds(doc.match)}

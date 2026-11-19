@@ -13,14 +13,17 @@ interface Props {
   onRename: (id: string) => void;
   onDelete: () => void;
   onAddLoop: () => void;
+  nodeLabel?: string;
+  onLabelChange: (label: string) => void;
 }
 
-export function SelectionPanel({ selection, onRename, onDelete, onAddLoop }: Props) {
+export function SelectionPanel({ selection, onRename, onDelete, onAddLoop, nodeLabel, onLabelChange }: Props) {
   const [value, setValue] = useState(selection?.id ?? "");
+  const [label, setLabel] = useState(nodeLabel ?? "");
   if (!selection) {
     return (
       <Text size="sm" c="dimmed">
-        Kliknij wierzchołek lub krawędź, żeby zmienić id albo usunąć element. Dwuklik na pustym tle
+        Kliknij wierzchołek, żeby zmienić jego etykietę lub id. Różne wierzchołki mogą mieć taką samą etykietę. Dwuklik na pustym tle
         dodaje wierzchołek. W trybie rysowania przeciągnij od wierzchołka do wierzchołka, żeby dodać
         krawędź.
       </Text>
@@ -31,8 +34,21 @@ export function SelectionPanel({ selection, onRename, onDelete, onAddLoop }: Pro
       <Text size="sm" fw={600}>
         {selection.kind === "node" ? "Wierzchołek" : "Krawędź"} w grafie {selection.graph}
       </Text>
+      {selection.kind === "node" && (
+        <>
+          <TextInput
+            label="Etykieta"
+            description="Tekst na rysunku. Może się powtarzać; nie wpływa na dopasowania."
+            value={label}
+            onChange={(event) => setLabel(event.currentTarget.value)}
+            onKeyDown={(event) => { if (event.key === "Enter") onLabelChange(label); }}
+          />
+          <Button size="xs" variant="light" onClick={() => onLabelChange(label)}>Zmień etykietę</Button>
+        </>
+      )}
       <TextInput
         label="Identyfikator"
+        description="Unikalne id używane przez krawędzie i dopasowania."
         value={value}
         onChange={(event) => setValue(event.currentTarget.value)}
         onKeyDown={(event) => {

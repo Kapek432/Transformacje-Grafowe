@@ -24,13 +24,29 @@ def test_slide8(document: dict[str, Any]) -> None:
     assert host == document["graph"]
     assert result["status"] == "applied"
     intermediate = result["intermediate_graph"]
-    assert set(intermediate["nodes"]) == {"C", "D", "F", "G", "H", "I"}
+    assert {node["id"] for node in intermediate["nodes"]} == {
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+    }
     context = {("D", "C"), ("F", "I"), ("G", "F"), ("H", "D"), ("H", "G")}
     assert {
         (edge["source"], edge["target"]) for edge in intermediate["edges"]
     } == context
     final = result["result_graph"]
-    assert set(final["nodes"]) == {"C", "D", "F", "G", "H", "I", "M", "N"}
+    assert {node["id"] for node in final["nodes"]} == {
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "M",
+        "N",
+    }
     assert {(edge["source"], edge["target"]) for edge in final["edges"]} == context | {
         ("D", "N"),
         ("F", "N"),
@@ -57,15 +73,17 @@ def test_keeps_interface_edge_when_adding_parallel_edge(
 ) -> None:
     kept = {"id": "left-D-F", "source": "D", "target": "F"}
     document["rule"]["K"]["edges"].append(kept)
+    document["rule"]["l"]["edges"]["left-D-F"] = "left-D-F"
+    document["rule"]["r"]["edges"]["left-D-F"] = "left-D-F"
     document["rule"]["R"]["edges"].extend(
         [kept, {"id": "D-F", "source": "D", "target": "F"}]
     )
-    document["graph"]["nodes"].append("M")
+    document["graph"]["nodes"].append({"id": "M", "label": "M"})
 
     _, result = apply_dpo(document)
 
     final = result["result_graph"]
-    assert {"M", "M_1"} <= set(final["nodes"])
+    assert {"M", "M_1"} <= {node["id"] for node in final["nodes"]}
     assert [
         edge["id"]
         for edge in final["edges"]

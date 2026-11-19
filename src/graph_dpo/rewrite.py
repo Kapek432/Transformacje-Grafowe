@@ -29,20 +29,33 @@ def _rewrite(host: Graph, rule: Rule, match: Match) -> Applied | Rejected:
             for edge_id, ends in host.edges.items()
             if edge_id not in removed_edges
         },
+        {
+            node: label
+            for node, label in host.labels.items()
+            if node not in removed_nodes
+        },
     )
 
     # The second square identifies the copy of K in R with its matched copy in D.
-    right_nodes = {node: match.nodes[node] for node in interface.nodes}
+    right_nodes = {
+        rule.right_map.nodes[node]: match.nodes[rule.left_map.nodes[node]]
+        for node in interface.nodes
+    }
     used_nodes = set(host.nodes)
     used_edges = set(host.edges)
+    result_labels = intermediate.labels.copy()
     result_nodes = list(intermediate.nodes)
     result_edges = intermediate.edges.copy()
     for node in right.nodes:
         if node not in right_nodes:
             right_nodes[node] = _fresh(node, used_nodes)
             result_nodes.append(right_nodes[node])
+            if node in right.labels:
+                result_labels[right_nodes[node]] = right.labels[node]
+            elif right_nodes[node] != node:
+                result_labels[right_nodes[node]] = node
     for edge_id, (source, target) in right.edges.items():
-        if edge_id not in interface.edges:
+        if edge_id not in rule.right_map.edges.values():
             result_edges[_fresh(edge_id, used_edges)] = (
                 right_nodes[source],
                 right_nodes[target],
@@ -51,7 +64,9 @@ def _rewrite(host: Graph, rule: Rule, match: Match) -> Applied | Rejected:
     return {
         "status": "applied",
         "intermediate_graph": intermediate.as_json(),
-        "result_graph": Graph(tuple(result_nodes), result_edges).as_json(),
+        "result_graph": Graph(
+            tuple(result_nodes), result_edges, result_labels
+        ).as_json(),
     }
 
 

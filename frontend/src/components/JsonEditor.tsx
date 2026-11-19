@@ -17,7 +17,7 @@ export function JsonEditor({ doc, dark, onChange }: Props) {
   const [text, setText] = useState(serialized);
   const [error, setError] = useState<string | null>(null);
   // Skipping the echo of our own edit keeps the cursor and formatting while typing.
-  // It is compared in the reducer's normalized form because loading re-derives K.
+  // It is compared in the reducer's normalized form because loading fills legacy morphisms.
   const lastSent = useRef<string | null>(null);
 
   useEffect(() => {

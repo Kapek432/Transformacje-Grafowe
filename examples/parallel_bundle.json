@@ -1,14 +1,38 @@
 {
   "graph": {
     "nodes": [
-      "Source",
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "Sink",
-      "Monitor"
+      {
+        "id": "Source",
+        "label": "Source"
+      },
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      },
+      {
+        "id": "Sink",
+        "label": "Sink"
+      },
+      {
+        "id": "Monitor",
+        "label": "Monitor"
+      }
     ],
     "edges": [
       {
@@ -71,8 +95,14 @@
   "rule": {
     "L": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -89,8 +119,14 @@
     },
     "K": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -102,9 +138,18 @@
     },
     "R": {
       "nodes": [
-        "x",
-        "y",
-        "relay"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        },
+        {
+          "id": "relay",
+          "label": "relay"
+        }
       ],
       "edges": [
         {
@@ -123,6 +168,24 @@
           "target": "y"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {
+        "keep": "keep"
+      }
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {
+        "keep": "keep"
+      }
     }
   },
   "match": {

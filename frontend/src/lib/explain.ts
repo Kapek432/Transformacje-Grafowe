@@ -1,13 +1,13 @@
 import type { GraphData, MatchData } from "./types";
 
 export function danglingExplanation(
-  rule: { L: GraphData; K: GraphData },
+  rule: { L: GraphData; K: GraphData; l?: MatchData },
   match: MatchData,
   host: GraphData,
   edgeId: string,
 ): string {
-  const kept = new Set(rule.K.nodes);
-  const deleted = new Set(rule.L.nodes.filter((node) => !kept.has(node)).map((node) => match.nodes[node]));
+  const kept = new Set(rule.l ? Object.values(rule.l.nodes) : rule.K.nodes.map((node) => node.id));
+  const deleted = new Set(rule.L.nodes.filter((node) => !kept.has(node.id)).map((node) => match.nodes[node.id]));
   const edge = host.edges.find((candidate) => candidate.id === edgeId);
   const node = edge && (deleted.has(edge.source) ? edge.source : edge.target);
   return (

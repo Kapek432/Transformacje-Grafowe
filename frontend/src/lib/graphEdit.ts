@@ -1,4 +1,4 @@
-import type { GraphData } from "./types";
+import { nodeIds, type GraphData } from "./types";
 
 function freshId(base: string, taken: Set<string>): string {
   let candidate = base;
@@ -16,7 +16,7 @@ function requireId(id: string): void {
 
 /** Reserved ids come from the other side of the rule, so a new element never joins K by accident. */
 export function nextNodeId(graph: GraphData, reserved: string[] = []): string {
-  const taken = new Set([...graph.nodes, ...reserved]);
+  const taken = new Set([...nodeIds(graph), ...reserved]);
   let number = 1;
   while (taken.has(`v${number}`)) number += 1;
   return `v${number}`;
@@ -24,8 +24,8 @@ export function nextNodeId(graph: GraphData, reserved: string[] = []): string {
 
 export function addNode(graph: GraphData, id: string): GraphData {
   requireId(id);
-  if (graph.nodes.includes(id)) throw new Error(`Wierzchołek "${id}" już istnieje.`);
-  return { nodes: [...graph.nodes, id], edges: graph.edges };
+  if (graph.nodes.some((node) => node.id === id)) throw new Error(`Wierzchołek "${id}" już istnieje.`);
+  return { ...graph, nodes: [...graph.nodes, {id, label:id}] };
 }
 
 export function addEdge(
@@ -36,14 +36,14 @@ export function addEdge(
 ): GraphData {
   const taken = new Set([...graph.edges.map((edge) => edge.id), ...reserved]);
   const id = freshId(`${source}-${target}`, taken);
-  return { nodes: graph.nodes, edges: [...graph.edges, { id, source, target }] };
+  return { ...graph, edges: [...graph.edges, { id, source, target }] };
 }
 
 export function removeElements(graph: GraphData, nodeIds: string[], edgeIds: string[]): GraphData {
   const nodes = new Set(nodeIds);
   const edges = new Set(edgeIds);
   return {
-    nodes: graph.nodes.filter((node) => !nodes.has(node)),
+    nodes: graph.nodes.filter((node) => !nodes.has(node.id)),
     edges: graph.edges.filter(
       (edge) => !edges.has(edge.id) && !nodes.has(edge.source) && !nodes.has(edge.target),
     ),
@@ -53,10 +53,10 @@ export function removeElements(graph: GraphData, nodeIds: string[], edgeIds: str
 export function renameNode(graph: GraphData, from: string, to: string): GraphData {
   if (from === to) return graph;
   requireId(to);
-  if (graph.nodes.includes(to)) throw new Error(`Wierzchołek "${to}" już istnieje.`);
+  if (graph.nodes.some((node) => node.id === to)) throw new Error(`Wierzchołek "${to}" już istnieje.`);
   const swap = (id: string) => (id === from ? to : id);
   return {
-    nodes: graph.nodes.map(swap),
+    nodes: graph.nodes.map((node) => node.id === from ? {...node, id: to} : node),
     edges: graph.edges.map((edge) => ({ ...edge, source: swap(edge.source), target: swap(edge.target) })),
   };
 }
@@ -68,7 +68,16 @@ export function renameEdge(graph: GraphData, from: string, to: string): GraphDat
     throw new Error(`Krawędź "${to}" już istnieje.`);
   }
   return {
-    nodes: graph.nodes,
+    ...graph,
     edges: graph.edges.map((edge) => (edge.id === from ? { ...edge, id: to } : edge)),
   };
+}
+
+
+export function setNodeLabel(graph: GraphData, id: string, label: string): GraphData {
+  if (!graph.nodes.some((node) => node.id === id)) throw new Error(`Nie ma wierzchołka "${id}".`);
+  if (label.length > 32767 || /[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Cn}\p{Zl}\p{Zp}]/u.test(label)) {
+    throw new Error("Etykieta musi być drukowalnym tekstem o długości do 32767 znaków.");
+  }
+  return { ...graph, nodes: graph.nodes.map((node) => node.id === id ? {...node, label} : node) };
 }

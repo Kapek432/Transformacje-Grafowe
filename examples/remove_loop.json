@@ -1,8 +1,14 @@
 {
   "graph": {
     "nodes": [
-      "A",
-      "B"
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      }
     ],
     "edges": [
       {
@@ -20,7 +26,10 @@
   "rule": {
     "L": {
       "nodes": [
-        "x"
+        {
+          "id": "x",
+          "label": "x"
+        }
       ],
       "edges": [
         {
@@ -32,15 +41,33 @@
     },
     "K": {
       "nodes": [
-        "x"
+        {
+          "id": "x",
+          "label": "x"
+        }
       ],
       "edges": []
     },
     "R": {
       "nodes": [
-        "x"
+        {
+          "id": "x",
+          "label": "x"
+        }
       ],
       "edges": []
+    },
+    "l": {
+      "nodes": {
+        "x": "x"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "x": "x"
+      },
+      "edges": {}
     }
   },
   "match": {

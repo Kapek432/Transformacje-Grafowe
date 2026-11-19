@@ -2,10 +2,10 @@ import { Box, Group, Text } from "@mantine/core";
 import { COLORS } from "./graphStyle";
 
 const ITEMS = {
-  interface: { label: "K (wspólne dla L i R)", color: COLORS.interface },
+  interface: { label: "Obrazy K przez morfizmy l i r", color: COLORS.interface },
   matched: { label: "dopasowanie", color: COLORS.matched },
-  removed: { label: "usuwane (L \\ K)", color: COLORS.removed },
-  added: { label: "dodane (R \\ K)", color: COLORS.added },
+  removed: { label: "usuwane (L \\ l(K))", color: COLORS.removed },
+  added: { label: "dodane (R \\ r(K))", color: COLORS.added },
 };
 
 export function Legend({ items }: { items: (keyof typeof ITEMS)[] }) {

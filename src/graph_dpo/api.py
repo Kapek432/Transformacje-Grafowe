@@ -34,10 +34,10 @@ def _describe(host: Graph, rule: Rule, match: Match) -> dict[str, Any]:
 
 
 def _difference(first: GraphData, second: GraphData) -> dict[str, list[str]]:
-    nodes = set(second["nodes"])
+    nodes = {node["id"] for node in second["nodes"]}
     edges = {edge["id"] for edge in second["edges"]}
     return {
-        "nodes": [node for node in first["nodes"] if node not in nodes],
+        "nodes": [node["id"] for node in first["nodes"] if node["id"] not in nodes],
         "edges": [edge["id"] for edge in first["edges"] if edge["id"] not in edges],
     }
 

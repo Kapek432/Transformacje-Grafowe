@@ -1,14 +1,16 @@
-import { Alert, Button, Card, Grid, Group, List, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Alert, Card, Grid, Group, List, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMemo, useState, type Dispatch, type ReactNode } from "react";
+import { useMemo, useState, type Dispatch } from "react";
 import { graphByName, type DocumentAction } from "../lib/document";
-import { addEdge, addNode, nextNodeId, removeElements, renameEdge, renameNode } from "../lib/graphEdit";
+import { addEdge, addNode, nextNodeId, removeElements, renameEdge, renameNode, setNodeLabel } from "../lib/graphEdit";
 import { completeLayout } from "../lib/layout";
-import { emptyGraph, type DpoDocument, type GraphData, type GraphName, type Position } from "../lib/types";
+import { emptyGraph, nodeIds, nodeLabel, type DpoDocument, type GraphData, type GraphName, type Position } from "../lib/types";
+import { morphismImage } from "../lib/rule";
 import { validateDocument } from "../lib/validate";
 import { GraphCanvas, type CanvasSelection } from "./GraphCanvas";
 import { JsonEditor } from "./JsonEditor";
 import { Legend } from "./Legend";
+import { MorphismEditor } from "./MorphismEditor";
 import { SelectionPanel, type EditorSelection } from "./SelectionPanel";
 
 interface Props {
@@ -21,17 +23,17 @@ interface Props {
 function selectionExists(doc: DpoDocument, selection: EditorSelection): boolean {
   const graph = graphByName(doc, selection.graph);
   return selection.kind === "node"
-    ? graph.nodes.includes(selection.id)
+    ? graph.nodes.some((node) => node.id === selection.id)
     : graph.edges.some((edge) => edge.id === selection.id);
 }
 
 export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
   const [picked, setSelection] = useState<EditorSelection | null>(null);
   const [drawEdges, setDrawEdges] = useState(false);
-  // JSON edits, loads and "Skopiuj L do R" can remove the picked element behind the panel's back.
+  // JSON edits and loads can remove the picked element behind the panel's back.
   const selection = picked && selectionExists(doc, picked) ? picked : null;
   const issues = useMemo(() => validateDocument(doc), [doc]);
-  const interfaceIds = { nodes: doc.rule.K.nodes, edges: doc.rule.K.edges.map((edge) => edge.id) };
+  const interfaceIds = { nodes: nodeIds(doc.rule.K), edges: doc.rule.K.edges.map((edge) => edge.id) };
 
   const otherSide = (name: GraphName): GraphData => {
     if (name === "L") return doc.rule.R;
@@ -63,12 +65,10 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
     guarded(() => {
       if (!selection) return;
       const graph = graphByName(doc, selection.graph);
-      if (selection.kind === "node") {
-        const { [selection.id]: position, ...rest } = positionsOf(selection.graph);
-        edit(selection.graph, renameNode(graph, selection.id, to), { ...rest, [to]: position });
-      } else {
-        edit(selection.graph, renameEdge(graph, selection.id, to));
-      }
+      // Validate before dispatch so invalid ids are reported by the editor's notification.
+      if (selection.kind === "node") renameNode(graph, selection.id, to);
+      else renameEdge(graph, selection.id, to);
+      dispatch({type:"renameElement",name:selection.graph,kind:selection.kind,from:selection.id,to});
       setSelection({ ...selection, id: to });
     });
 
@@ -78,16 +78,15 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
     edit(selection.graph, addEdge(graphByName(doc, selection.graph), selection.id, selection.id, reserved));
   };
 
-  const canvas = (name: GraphName, title: string, height: number, extra?: ReactNode) => (
+  const canvas = (name: GraphName, title: string, height: number) => (
     <Card withBorder radius="md" padding="sm">
       <Group justify="space-between" mb="xs">
         <Text fw={600}>{title}</Text>
-        {extra}
       </Group>
       <GraphCanvas
         graph={graphByName(doc, name)}
         positions={positionsOf(name)}
-        highlight={name === "G" ? {} : { interface: interfaceIds }}
+        highlight={name === "G" ? {} : { interface: name === "K" ? interfaceIds : morphismImage(doc.rule, name === "L" ? "l" : "r") }}
         dark={dark}
         height={height}
         editable
@@ -97,7 +96,7 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
         onAddNode={(position) =>
           guarded(() => {
             const graph = graphByName(doc, name);
-            const id = nextNodeId(graph, otherSide(name).nodes);
+            const id = nextNodeId(graph, nodeIds(otherSide(name)));
             edit(name, addNode(graph, id), { ...positionsOf(name), [id]: position });
           })
         }
@@ -129,26 +128,28 @@ export function EditorTab({ doc, dispatch, dark, fitKey }: Props) {
             <Legend items={["interface"]} />
           </Group>
           {canvas("G", "Graf G", 340)}
-          <SimpleGrid cols={{ base: 1, md: 2 }}>
+          <Text fw={600}>Reguła L ← K → R</Text>
+          <SimpleGrid cols={{ base: 1, md: 3 }}>
             {canvas("L", "Lewa strona L", 280)}
-            {canvas(
-              "R",
-              "Prawa strona R",
-              280,
-              <Button size="xs" variant="light" onClick={() => dispatch({ type: "copyLeftToRight" })}>
-                Skopiuj L do R
-              </Button>,
-            )}
+            {canvas("K", "Interfejs K (osobny graf)", 280)}
+            {canvas("R", "Prawa strona R", 280)}
           </SimpleGrid>
+          {doc.rule.K.nodes.length === 0 && <Text size="sm" c="dimmed">K = ∅ - reguła nie zachowuje żadnych elementów.</Text>}
+          <MorphismEditor rule={doc.rule} onChange={(side, mapping) => dispatch({type: "setMorphism", side, mapping})} />
         </Stack>
       </Grid.Col>
       <Grid.Col span={{ base: 12, lg: 4 }}>
         <Stack gap="md">
           <Card withBorder radius="md">
             <SelectionPanel
-              key={JSON.stringify(selection)}
+              key={JSON.stringify([selection, selection?.kind === "node" ? nodeLabel(graphByName(doc, selection.graph), selection.id) : null])}
               selection={selection}
               onRename={rename}
+              nodeLabel={selection?.kind === "node" ? nodeLabel(graphByName(doc, selection.graph), selection.id) : undefined}
+              onLabelChange={(label) => guarded(() => {
+                if (!selection || selection.kind !== "node") return;
+                edit(selection.graph, setNodeLabel(graphByName(doc, selection.graph), selection.id, label));
+              })}
               onDelete={deleteSelection}
               onAddLoop={addLoop}
             />

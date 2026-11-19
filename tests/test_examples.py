@@ -19,6 +19,12 @@ EXPECTED_SEARCH = [
     ("connect_components", 90, 90),
     ("cycle_no_match", 0, 0),
     ("diamond_expand", 4, 4),
+    ("k_cycle_attachment", 2, 1),
+    ("k_disconnected_bridge", 8, 8),
+    ("k_loop_preserved", 1, 1),
+    ("k_parallel_preserved", 6, 6),
+    ("k_path_branch", 4, 2),
+    ("k_path_branch_rejected", 4, 0),
     ("loop_cleanup_network", 4, 4),
     ("name_collisions", 6, 6),
     ("parallel_bundle", 8, 8),
@@ -79,32 +85,37 @@ def test_every_discovered_match_preserves_context(name: str) -> None:
         removed_nodes = {
             match.nodes[node]
             for node in rule.left.nodes
-            if node not in rule.interface.nodes
+            if node not in rule.left_map.nodes.values()
         }
         removed_edges = {
             match.edges[edge]
             for edge in rule.left.edges
-            if edge not in rule.interface.edges
+            if edge not in rule.left_map.edges.values()
         }
         intermediate = result["intermediate_graph"]
         final = result["result_graph"]
         context_edges = {
             key: value for key, value in host.edges.items() if key not in removed_edges
         }
-        assert set(intermediate["nodes"]) == set(host.nodes) - removed_nodes
+        assert {node["id"] for node in intermediate["nodes"]} == set(
+            host.nodes
+        ) - removed_nodes
         assert _edges(intermediate) == context_edges
         assert context_edges.items() <= _edges(final).items()
-        assert set(intermediate["nodes"]) <= set(final["nodes"])
+        assert {node["id"] for node in intermediate["nodes"]} <= {
+            node["id"] for node in final["nodes"]
+        }
         assert len(final["nodes"]) == len(intermediate["nodes"]) + len(
             rule.right.nodes
         ) - len(rule.interface.nodes)
         assert len(final["edges"]) == len(intermediate["edges"]) + len(
             rule.right.edges
         ) - len(rule.interface.edges)
-        assert len(final["nodes"]) == len(set(final["nodes"]))
+        assert len(final["nodes"]) == len({node["id"] for node in final["nodes"]})
         assert len(final["edges"]) == len(_edges(final))
         assert all(
-            source in final["nodes"] and target in final["nodes"]
+            source in {node["id"] for node in final["nodes"]}
+            and target in {node["id"] for node in final["nodes"]}
             for source, target in _edges(final).values()
         )
     assert document == original
@@ -171,14 +182,13 @@ def test_complex_example_exact_rewrite(
     context = {
         key: value for key, value in _edges(host).items() if key not in removed_edges
     }
-    assert (
-        set(result["intermediate_graph"]["nodes"]) == set(host["nodes"]) - removed_nodes
-    )
+    assert {node["id"] for node in result["intermediate_graph"]["nodes"]} == {
+        node["id"] for node in host["nodes"]
+    } - removed_nodes
     assert _edges(result["intermediate_graph"]) == context
-    assert (
-        set(result["result_graph"]["nodes"])
-        == (set(host["nodes"]) - removed_nodes) | added_nodes
-    )
+    assert {node["id"] for node in result["result_graph"]["nodes"]} == (
+        {node["id"] for node in host["nodes"]} - removed_nodes
+    ) | added_nodes
     assert _edges(result["result_graph"]) == context | added_edges
 
 
@@ -203,15 +213,15 @@ def test_examples_through_api(name: str, tmp_path: Path) -> None:
         else:
             intermediate = expected["intermediate_graph"]
             final = expected["result_graph"]
-            assert set(body["removed"]["nodes"]) == set(
-                document["graph"]["nodes"]
-            ) - set(intermediate["nodes"])
+            assert set(body["removed"]["nodes"]) == {
+                node["id"] for node in document["graph"]["nodes"]
+            } - {node["id"] for node in intermediate["nodes"]}
             assert set(body["removed"]["edges"]) == set(
                 _edges(document["graph"])
             ) - set(_edges(intermediate))
-            assert set(body["added"]["nodes"]) == set(final["nodes"]) - set(
-                intermediate["nodes"]
-            )
+            assert set(body["added"]["nodes"]) == {
+                node["id"] for node in final["nodes"]
+            } - {node["id"] for node in intermediate["nodes"]}
             assert set(body["added"]["edges"]) == set(_edges(final)) - set(
                 _edges(intermediate)
             )

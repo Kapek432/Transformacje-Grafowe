@@ -4,8 +4,13 @@ export interface Edge {
   target: string;
 }
 
+export interface GraphNode {
+  id: string;
+  label: string;
+}
+
 export interface GraphData {
-  nodes: string[];
+  nodes: GraphNode[];
   edges: Edge[];
 }
 
@@ -14,7 +19,7 @@ export interface Position {
   y: number;
 }
 
-export type GraphName = "G" | "L" | "R";
+export type GraphName = "G" | "L" | "K" | "R";
 
 export type Layout = Partial<Record<GraphName, Record<string, Position>>>;
 
@@ -25,7 +30,7 @@ export interface MatchData {
 
 export interface DpoDocument {
   graph: GraphData;
-  rule: { L: GraphData; K: GraphData; R: GraphData };
+  rule: { L: GraphData; K: GraphData; R: GraphData; l?: MatchData; r?: MatchData };
   match?: MatchData;
   layout?: Layout;
 }
@@ -57,3 +62,6 @@ export interface ApplyResponse {
 }
 
 export const emptyGraph = (): GraphData => ({ nodes: [], edges: [] });
+
+export const nodeIds = (graph: GraphData): string[] => graph.nodes.map((node) => node.id);
+export const nodeLabel = (graph: GraphData, id: string): string => graph.nodes.find((node) => node.id === id)?.label ?? id;

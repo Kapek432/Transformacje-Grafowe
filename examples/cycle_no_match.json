@@ -1,16 +1,46 @@
 {
   "graph": {
     "nodes": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H",
-      "I",
-      "J"
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      },
+      {
+        "id": "F",
+        "label": "F"
+      },
+      {
+        "id": "G",
+        "label": "G"
+      },
+      {
+        "id": "H",
+        "label": "H"
+      },
+      {
+        "id": "I",
+        "label": "I"
+      },
+      {
+        "id": "J",
+        "label": "J"
+      }
     ],
     "edges": [
       {
@@ -73,9 +103,18 @@
   "rule": {
     "L": {
       "nodes": [
-        "x",
-        "y",
-        "z"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        },
+        {
+          "id": "z",
+          "label": "z"
+        }
       ],
       "edges": [
         {
@@ -97,9 +136,18 @@
     },
     "K": {
       "nodes": [
-        "x",
-        "y",
-        "z"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        },
+        {
+          "id": "z",
+          "label": "z"
+        }
       ],
       "edges": [
         {
@@ -121,9 +169,18 @@
     },
     "R": {
       "nodes": [
-        "x",
-        "y",
-        "z"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        },
+        {
+          "id": "z",
+          "label": "z"
+        }
       ],
       "edges": [
         {
@@ -142,6 +199,30 @@
           "target": "x"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y",
+        "z": "z"
+      },
+      "edges": {
+        "xy": "xy",
+        "yz": "yz",
+        "zx": "zx"
+      }
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y",
+        "z": "z"
+      },
+      "edges": {
+        "xy": "xy",
+        "yz": "yz",
+        "zx": "zx"
+      }
     }
   }
 }

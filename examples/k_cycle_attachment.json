@@ -1,0 +1,315 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "Old",
+        "label": "OLD"
+      },
+      {
+        "id": "X",
+        "label": "X"
+      },
+      {
+        "id": "Y",
+        "label": "Y"
+      },
+      {
+        "id": "Exit",
+        "label": "EXIT"
+      }
+    ],
+    "edges": [
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "ca",
+        "source": "C",
+        "target": "A"
+      },
+      {
+        "id": "b-old",
+        "source": "B",
+        "target": "Old"
+      },
+      {
+        "id": "cx",
+        "source": "C",
+        "target": "X"
+      },
+      {
+        "id": "xy",
+        "source": "X",
+        "target": "Y"
+      },
+      {
+        "id": "out",
+        "source": "Y",
+        "target": "Exit"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        {
+          "id": "l_a",
+          "label": "A"
+        },
+        {
+          "id": "l_b",
+          "label": "B"
+        },
+        {
+          "id": "l_c",
+          "label": "C"
+        },
+        {
+          "id": "l_old",
+          "label": "OLD"
+        }
+      ],
+      "edges": [
+        {
+          "id": "l_ab",
+          "source": "l_a",
+          "target": "l_b"
+        },
+        {
+          "id": "l_bc",
+          "source": "l_b",
+          "target": "l_c"
+        },
+        {
+          "id": "l_ca",
+          "source": "l_c",
+          "target": "l_a"
+        },
+        {
+          "id": "l_bo",
+          "source": "l_b",
+          "target": "l_old"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        {
+          "id": "k_a",
+          "label": "A"
+        },
+        {
+          "id": "k_b",
+          "label": "B"
+        },
+        {
+          "id": "k_c",
+          "label": "C"
+        }
+      ],
+      "edges": [
+        {
+          "id": "k_ab",
+          "source": "k_a",
+          "target": "k_b"
+        },
+        {
+          "id": "k_bc",
+          "source": "k_b",
+          "target": "k_c"
+        },
+        {
+          "id": "k_ca",
+          "source": "k_c",
+          "target": "k_a"
+        }
+      ]
+    },
+    "R": {
+      "nodes": [
+        {
+          "id": "r_a",
+          "label": "A"
+        },
+        {
+          "id": "r_b",
+          "label": "B"
+        },
+        {
+          "id": "r_c",
+          "label": "C"
+        },
+        {
+          "id": "r_new",
+          "label": "NEW"
+        }
+      ],
+      "edges": [
+        {
+          "id": "r_ab",
+          "source": "r_a",
+          "target": "r_b"
+        },
+        {
+          "id": "r_bc",
+          "source": "r_b",
+          "target": "r_c"
+        },
+        {
+          "id": "r_ca",
+          "source": "r_c",
+          "target": "r_a"
+        },
+        {
+          "id": "r_an",
+          "source": "r_a",
+          "target": "r_new"
+        },
+        {
+          "id": "r_nc",
+          "source": "r_new",
+          "target": "r_c"
+        }
+      ]
+    },
+    "l": {
+      "nodes": {
+        "k_a": "l_a",
+        "k_b": "l_b",
+        "k_c": "l_c"
+      },
+      "edges": {
+        "k_ab": "l_ab",
+        "k_bc": "l_bc",
+        "k_ca": "l_ca"
+      }
+    },
+    "r": {
+      "nodes": {
+        "k_a": "r_a",
+        "k_b": "r_b",
+        "k_c": "r_c"
+      },
+      "edges": {
+        "k_ab": "r_ab",
+        "k_bc": "r_bc",
+        "k_ca": "r_ca"
+      }
+    }
+  },
+  "match": {
+    "nodes": {
+      "l_a": "A",
+      "l_b": "B",
+      "l_c": "C",
+      "l_old": "Old"
+    },
+    "edges": {
+      "l_ab": "ab",
+      "l_bc": "bc",
+      "l_ca": "ca",
+      "l_bo": "b-old"
+    }
+  },
+  "layout": {
+    "G": {
+      "A": {
+        "x": 0,
+        "y": 0
+      },
+      "B": {
+        "x": 160,
+        "y": 0
+      },
+      "C": {
+        "x": 320,
+        "y": 0
+      },
+      "Old": {
+        "x": 0,
+        "y": 140
+      },
+      "X": {
+        "x": 160,
+        "y": 140
+      },
+      "Y": {
+        "x": 320,
+        "y": 140
+      },
+      "Exit": {
+        "x": 0,
+        "y": 280
+      }
+    },
+    "L": {
+      "l_a": {
+        "x": 0,
+        "y": 0
+      },
+      "l_b": {
+        "x": 160,
+        "y": 0
+      },
+      "l_c": {
+        "x": 320,
+        "y": 0
+      },
+      "l_old": {
+        "x": 0,
+        "y": 140
+      }
+    },
+    "K": {
+      "k_a": {
+        "x": 0,
+        "y": 0
+      },
+      "k_b": {
+        "x": 160,
+        "y": 0
+      },
+      "k_c": {
+        "x": 320,
+        "y": 0
+      }
+    },
+    "R": {
+      "r_a": {
+        "x": 0,
+        "y": 0
+      },
+      "r_b": {
+        "x": 160,
+        "y": 0
+      },
+      "r_c": {
+        "x": 320,
+        "y": 0
+      },
+      "r_new": {
+        "x": 0,
+        "y": 140
+      }
+    }
+  }
+}

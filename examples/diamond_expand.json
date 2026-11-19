@@ -1,17 +1,50 @@
 {
   "graph": {
     "nodes": [
-      "Source",
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H",
-      "Sink",
-      "Audit"
+      {
+        "id": "Source",
+        "label": "Source"
+      },
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      },
+      {
+        "id": "F",
+        "label": "F"
+      },
+      {
+        "id": "G",
+        "label": "G"
+      },
+      {
+        "id": "H",
+        "label": "H"
+      },
+      {
+        "id": "Sink",
+        "label": "Sink"
+      },
+      {
+        "id": "Audit",
+        "label": "Audit"
+      }
     ],
     "edges": [
       {
@@ -84,10 +117,22 @@
   "rule": {
     "L": {
       "nodes": [
-        "s",
-        "p",
-        "q",
-        "t"
+        {
+          "id": "s",
+          "label": "s"
+        },
+        {
+          "id": "p",
+          "label": "p"
+        },
+        {
+          "id": "q",
+          "label": "q"
+        },
+        {
+          "id": "t",
+          "label": "t"
+        }
       ],
       "edges": [
         {
@@ -114,19 +159,43 @@
     },
     "K": {
       "nodes": [
-        "s",
-        "t"
+        {
+          "id": "s",
+          "label": "s"
+        },
+        {
+          "id": "t",
+          "label": "t"
+        }
       ],
       "edges": []
     },
     "R": {
       "nodes": [
-        "s",
-        "t",
-        "split",
-        "upper",
-        "lower",
-        "merge"
+        {
+          "id": "s",
+          "label": "s"
+        },
+        {
+          "id": "t",
+          "label": "t"
+        },
+        {
+          "id": "split",
+          "label": "split"
+        },
+        {
+          "id": "upper",
+          "label": "upper"
+        },
+        {
+          "id": "lower",
+          "label": "lower"
+        },
+        {
+          "id": "merge",
+          "label": "merge"
+        }
       ],
       "edges": [
         {
@@ -160,6 +229,20 @@
           "target": "t"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "s": "s",
+        "t": "t"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "s": "s",
+        "t": "t"
+      },
+      "edges": {}
     }
   },
   "match": {

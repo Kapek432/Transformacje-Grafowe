@@ -1,37 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { documentReducer, emptyDocument, normalizeDocument } from "./document";
 
-const L = { nodes: ["a", "b"], edges: [{ id: "x", source: "a", target: "b" }] };
+const L = { nodes: [{"id": "a", "label": "a"}, {"id": "b", "label": "b"}], edges: [{ id: "x", source: "a", target: "b" }] };
 
 describe("documentReducer", () => {
-  it("derives K after editing L or R and clears the match", () => {
+  it("preserves K after editing L or R and clears the match", () => {
     const start = { ...emptyDocument(), match: { nodes: {}, edges: {} } };
 
     const withL = documentReducer(start, { type: "editGraph", name: "L", graph: L });
     const withR = documentReducer(withL, {
       type: "editGraph",
       name: "R",
-      graph: { nodes: ["a"], edges: [] },
+      graph: { nodes: [{"id": "a", "label": "a"}], edges: [] },
     });
 
     expect(withL.match).toBeUndefined();
     expect(withL.rule.K).toEqual({ nodes: [], edges: [] });
-    expect(withR.rule.K).toEqual({ nodes: ["a"], edges: [] });
-  });
-
-  it("copies L to R with positions", () => {
-    const start = documentReducer(emptyDocument(), {
-      type: "editGraph",
-      name: "L",
-      graph: L,
-      positions: { a: { x: 1, y: 2 } },
-    });
-
-    const copied = documentReducer(start, { type: "copyLeftToRight" });
-
-    expect(copied.rule.R).toEqual(L);
-    expect(copied.rule.K).toEqual(L);
-    expect(copied.layout?.R).toEqual({ a: { x: 1, y: 2 } });
+    expect(withR.rule.K).toEqual({ nodes: [], edges: [] });
   });
 
   it("stores positions without clearing the match", () => {
@@ -45,11 +30,11 @@ describe("documentReducer", () => {
     expect(moved.layout?.G).toEqual({ a: { x: 0, y: 0 } });
   });
 
-  it("recomputes K when loading", () => {
+  it("preserves explicitly empty K when loading", () => {
     const doc = emptyDocument();
     doc.rule = { L, K: { nodes: [], edges: [] }, R: L };
 
-    expect(documentReducer(emptyDocument(), { type: "load", document: doc }).rule.K).toEqual(L);
+    expect(documentReducer(emptyDocument(), { type: "load", document: doc }).rule.K).toEqual({nodes:[],edges:[]});
   });
 });
 

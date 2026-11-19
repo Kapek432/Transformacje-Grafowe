@@ -28,15 +28,15 @@ export function toElements(
   highlight: Highlight = {},
 ): ElementDefinition[] {
   return [
-    ...graph.nodes.map((id) => ({
+    ...graph.nodes.map(({id, label}) => ({
       group: "nodes" as const,
-      data: { id: nodeKey(id), label: id },
+      data: { id: nodeKey(id), originalId: id, label },
       position: positions[id] ? { ...positions[id] } : undefined,
       classes: elementClasses("nodes", id, highlight).join(" "),
     })),
     ...graph.edges.map((edge) => ({
       group: "edges" as const,
-      data: { id: edgeKey(edge.id), label: edge.id, source: nodeKey(edge.source), target: nodeKey(edge.target) },
+      data: { id: edgeKey(edge.id), originalId: edge.id, label: edge.id, source: nodeKey(edge.source), target: nodeKey(edge.target) },
       classes: elementClasses("edges", edge.id, highlight).join(" "),
     })),
   ];

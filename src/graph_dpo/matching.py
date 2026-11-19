@@ -8,11 +8,12 @@ from .models import Graph, Match, Rule
 def deleted_elements(rule: Rule, match: Match) -> tuple[set[str], set[str]]:
     """Return host nodes and edges matched by the part of L outside K."""
     nodes = {
-        match.nodes[node] for node in set(rule.left.nodes) - set(rule.interface.nodes)
+        match.nodes[node]
+        for node in set(rule.left.nodes) - set(rule.left_map.nodes.values())
     }
     edges = {
         match.edges[edge]
-        for edge in rule.left.edges.keys() - rule.interface.edges.keys()
+        for edge in rule.left.edges.keys() - set(rule.left_map.edges.values())
     }
     return nodes, edges
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TypedDict
 
 MAX_ID_LENGTH = 32767
@@ -10,8 +10,13 @@ class Edge(TypedDict):
     target: str
 
 
+class Node(TypedDict):
+    id: str
+    label: str
+
+
 class GraphData(TypedDict):
-    nodes: list[str]
+    nodes: list[Node]
     edges: list[Edge]
 
 
@@ -19,16 +24,27 @@ class GraphData(TypedDict):
 class Graph:
     nodes: tuple[str, ...]
     edges: dict[str, tuple[str, str]]
+    labels: dict[str, str] = field(default_factory=dict)
 
     def as_json(self) -> GraphData:
         """Return the graph in the shared input and output format."""
-        return {
-            "nodes": list(self.nodes),
+        data: GraphData = {
+            "nodes": [
+                {"id": node, "label": self.labels.get(node, node)}
+                for node in self.nodes
+            ],
             "edges": [
                 {"id": edge_id, "source": source, "target": target}
                 for edge_id, (source, target) in self.edges.items()
             ],
         }
+        return data
+
+
+@dataclass(frozen=True)
+class Match:
+    nodes: dict[str, str]
+    edges: dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -36,12 +52,8 @@ class Rule:
     left: Graph
     interface: Graph
     right: Graph
-
-
-@dataclass(frozen=True)
-class Match:
-    nodes: dict[str, str]
-    edges: dict[str, str]
+    left_map: Match
+    right_map: Match
 
 
 class Applied(TypedDict):

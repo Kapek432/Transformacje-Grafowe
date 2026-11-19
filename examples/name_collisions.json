@@ -1,14 +1,38 @@
 {
   "graph": {
     "nodes": [
-      "Start",
-      "A",
-      "B",
-      "End",
-      "relay",
-      "relay_1",
-      "relay_2",
-      "Archive"
+      {
+        "id": "Start",
+        "label": "Start"
+      },
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "End",
+        "label": "End"
+      },
+      {
+        "id": "relay",
+        "label": "relay"
+      },
+      {
+        "id": "relay_1",
+        "label": "relay_1"
+      },
+      {
+        "id": "relay_2",
+        "label": "relay_2"
+      },
+      {
+        "id": "Archive",
+        "label": "Archive"
+      }
     ],
     "edges": [
       {
@@ -46,8 +70,14 @@
   "rule": {
     "L": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -59,16 +89,31 @@
     },
     "K": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": []
     },
     "R": {
       "nodes": [
-        "x",
-        "y",
-        "relay"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        },
+        {
+          "id": "relay",
+          "label": "relay"
+        }
       ],
       "edges": [
         {
@@ -82,6 +127,20 @@
           "target": "y"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
     }
   },
   "match": {

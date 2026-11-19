@@ -42,7 +42,7 @@ const MAX_FIT_ZOOM = 1.4;
 function readPositions(cy: Core): Record<string, Position> {
   return Object.fromEntries(
     cy.nodes().map((node) => [
-      node.data("label") as string,
+      node.data("originalId") as string,
       { x: Math.round(node.position("x")), y: Math.round(node.position("y")) },
     ]),
   );
@@ -74,6 +74,7 @@ function syncElements(cy: Core, elements: ElementDefinition[]): void {
         cy.add(definition);
         continue;
       }
+      existing.data(definition.data);
       if (definition.position) existing.position(definition.position);
       existing.classes(definition.classes as string);
     }
@@ -115,7 +116,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
         return;
       }
       const element = selected[0];
-      latest.current.onSelect?.({ kind: element.isNode() ? "node" : "edge", id: element.data("label") as string });
+      latest.current.onSelect?.({ kind: element.isNode() ? "node" : "edge", id: element.data("originalId") as string });
     });
     cy.on("dragfree", "node", () => latest.current.onPositionsChange?.(readPositions(cy)));
     const eh = cy.edgehandles({ canConnect: () => true, snap: true, hoverDelay: 0 });
@@ -123,7 +124,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
     cy.on("ehcomplete", (_event: EventObject, ...params: unknown[]) => {
       const [source, target, added] = params as [NodeSingular, NodeSingular, EdgeSingular];
       added.remove();
-      latest.current.onAddEdge?.(source.data("label") as string, target.data("label") as string);
+      latest.current.onAddEdge?.(source.data("originalId") as string, target.data("originalId") as string);
     });
     return () => {
       eh.destroy();
@@ -167,7 +168,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
     cy.batch(() => {
       cy.elements().forEach((element) => {
         const kind = element.isNode() ? "nodes" : "edges";
-        element.classes(elementClasses(kind, element.data("label") as string, highlight).join(" "));
+        element.classes(elementClasses(kind, element.data("originalId") as string, highlight).join(" "));
       });
     });
   }, [highlightKey]);

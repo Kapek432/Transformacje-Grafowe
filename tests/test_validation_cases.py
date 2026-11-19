@@ -15,10 +15,14 @@ PROJECT = Path(__file__).resolve().parents[1]
 @pytest.mark.parametrize(
     ("path", "value", "message"),
     [
-        (("graph", "nodes"), ["A", "A", "B"], "powtórzony"),
-        (("graph", "nodes"), ["A", " ", "B"], "niepustym"),
-        (("graph", "nodes"), ["A", 1, "B"], "niepustym"),
-        (("graph", "nodes"), ["A", "B\n", "C"], "niedrukowalne"),
+        (
+            ("graph", "nodes"),
+            [{"id": id, "label": "A"} for id in ("A", "A", "B")],
+            "powtórzony",
+        ),
+        (("graph", "nodes", 0, "id"), " ", "niepustym"),
+        (("graph", "nodes", 0, "id"), 1, "niepustym"),
+        (("graph", "nodes", 0, "id"), "B\n", "niedrukowalne"),
         (("graph", "edges", 0, "target"), "missing", "nieistniejący koniec"),
         (
             ("graph", "edges"),
@@ -29,13 +33,21 @@ PROJECT = Path(__file__).resolve().parents[1]
             "powtórzoną krawędź",
         ),
         (("graph", "edges"), {}, "listy nodes i edges"),
-        (("rule", "K", "nodes"), ["unknown"], "Każdy wierzchołek K"),
+        (
+            ("rule", "K", "nodes"),
+            [{"id": "unknown", "label": "A"}],
+            "dokładnie wszystkie",
+        ),
         (
             ("rule", "K", "edges"),
             [{"id": "xy", "source": "y", "target": "x"}],
-            "te same końce",
+            "dokładnie wszystkie",
         ),
-        (("rule", "R"), {"nodes": ["x"], "edges": []}, "Każdy wierzchołek K"),
+        (
+            ("rule", "R"),
+            {"nodes": [{"id": "x", "label": "x"}], "edges": []},
+            "różne istniejące",
+        ),
         (("match", "nodes"), {"x": "A"}, "dokładnie wszystkie"),
         (("match", "nodes"), {"x": "A", "y": "B", "extra": "C"}, "dokładnie wszystkie"),
         (("match", "nodes"), {"x": "A", "y": "A"}, "różne istniejące"),
@@ -78,13 +90,16 @@ def test_interface_edge_requires_identical_endpoints_on_both_sides(side: str) ->
     document = json.loads((PROJECT / "examples/parallel_bundle.json").read_text())
     document["rule"][side]["edges"][0]["source"] = "y"
 
-    with pytest.raises(ValueError, match=f"te same końce w {side}"):
+    with pytest.raises(ValueError, match="nie zachowuje końców"):
         apply_dpo(document)
 
 
 def test_empty_left_can_create_a_component_in_empty_graph() -> None:
     empty = {"nodes": [], "edges": []}
-    right = {"nodes": ["A"], "edges": [{"id": "loop", "source": "A", "target": "A"}]}
+    right = {
+        "nodes": [{"id": "A", "label": "A"}],
+        "edges": [{"id": "loop", "source": "A", "target": "A"}],
+    }
     document = {
         "graph": empty,
         "rule": {"L": empty, "K": empty, "R": right},
@@ -101,7 +116,10 @@ def test_empty_left_can_create_a_component_in_empty_graph() -> None:
 
 
 def test_entire_graph_can_be_deleted() -> None:
-    graph = {"nodes": ["A"], "edges": [{"id": "loop", "source": "A", "target": "A"}]}
+    graph = {
+        "nodes": [{"id": "A", "label": "A"}],
+        "edges": [{"id": "loop", "source": "A", "target": "A"}],
+    }
     empty = {"nodes": [], "edges": []}
     document = {
         "graph": graph,

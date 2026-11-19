@@ -38,6 +38,10 @@ export function MatchList({ response, error, selected, onHover, onSelect }: Prop
         Znaleziono {response.matches.length}
         {response.truncated ? "+" : ""}. Najedź, żeby podświetlić na G. Kliknij, żeby zastosować.
       </Text>
+      <Text size="xs" c="dimmed">
+        Każda pozycja to osobny morfizm m: L → G. Symetria L może dawać kilka
+        dopasowań tego samego fragmentu G. Id wskazują węzły; etykiety nie ograniczają dopasowania.
+      </Text>
       {response.truncated && (
         <Alert color="yellow" variant="light">
           Pokazano pierwsze {response.matches.length} dopasowań.

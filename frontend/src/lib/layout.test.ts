@@ -10,14 +10,14 @@ describe("layout", () => {
   });
 
   it("uses a circle when nothing is known", () => {
-    const graph = { nodes: ["a", "b"], edges: [] };
+    const graph = { nodes: [{"id": "a", "label": "a"}, {"id": "b", "label": "b"}], edges: [] };
 
     expect(completeLayout(graph)).toEqual(circleLayout(["a", "b"]));
   });
 
   it("keeps known positions and places new nodes near their neighbours", () => {
     const graph = {
-      nodes: ["a", "b", "n"],
+      nodes: [{"id": "a", "label": "a"}, {"id": "b", "label": "b"}, {"id": "n", "label": "n"}],
       edges: [
         { id: "an", source: "a", target: "n" },
         { id: "bn", source: "b", target: "n" },
@@ -31,7 +31,7 @@ describe("layout", () => {
   });
 
   it("puts isolated new nodes to the right of the drawing", () => {
-    const graph = { nodes: ["a", "z"], edges: [] };
+    const graph = { nodes: [{"id": "a", "label": "a"}, {"id": "z", "label": "z"}], edges: [] };
 
     expect(completeLayout(graph, { a: { x: 10, y: 20 } }).z).toEqual({ x: 110, y: 20 });
   });

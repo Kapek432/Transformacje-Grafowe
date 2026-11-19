@@ -24,7 +24,27 @@ def _graph(value: object, name: str) -> Graph:
     raw_nodes, raw_edges = data.get("nodes"), data.get("edges")
     if not isinstance(raw_nodes, list) or not isinstance(raw_edges, list):
         raise InputError(f"{name} musi zawierać listy nodes i edges.")
-    nodes = tuple(_id(node, f"{name}.nodes") for node in raw_nodes)
+    if "node_labels" in data:
+        raise ValueError(
+            f"{name}: usuń stare node_labels; każdy węzeł musi mieć pola id i label."
+        )
+    labels: dict[str, str] = {}
+    parsed_nodes: list[str] = []
+    for index, item in enumerate(raw_nodes):
+        node = _object(item, f"{name}.nodes[{index}]")
+        node_id = _id(node.get("id"), f"{name}.nodes[{index}].id")
+        label = node.get("label")
+        if (
+            not isinstance(label, str)
+            or len(label) > MAX_ID_LENGTH
+            or not all(char.isprintable() for char in label)
+        ):
+            raise ValueError(
+                f"Etykieta w {name} musi być drukowalnym tekstem o długości do {MAX_ID_LENGTH} znaków."
+            )
+        parsed_nodes.append(node_id)
+        labels[node_id] = label
+    nodes = tuple(parsed_nodes)
     node_ids = set(nodes)
     if len(node_ids) != len(nodes):
         raise ValueError(f"{name} zawiera powtórzony identyfikator wierzchołka.")
@@ -41,7 +61,7 @@ def _graph(value: object, name: str) -> Graph:
         if source not in node_ids or target not in node_ids:
             raise ValueError(f"Krawędź {edge_id!r} w {name} ma nieistniejący koniec.")
         edges[edge_id] = (source, target)
-    return Graph(nodes, edges)
+    return Graph(nodes, edges, labels)
 
 
 def _validate_interface(interface: Graph, side: Graph, side_name: str) -> None:
@@ -67,6 +87,50 @@ def _mapping(
     return mapping
 
 
+def _morphism(value: object, interface: Graph, side: Graph, name: str) -> Match:
+    data = _object(value, name)
+    maps: list[dict[str, str]] = []
+    for kind, source_ids, target_ids in (
+        ("nodes", set(interface.nodes), set(side.nodes)),
+        ("edges", set(interface.edges), set(side.edges)),
+    ):
+        raw = _object(data.get(kind), f"{name}.{kind}")
+        if set(raw) != source_ids:
+            raise ValueError(
+                f"{name}.{kind} musi mapować dokładnie wszystkie identyfikatory z K."
+            )
+        mapping = {
+            key: _id(target, f"{name}.{kind}.{key}") for key, target in raw.items()
+        }
+        if not set(mapping.values()) <= target_ids or len(set(mapping.values())) != len(
+            mapping
+        ):
+            raise ValueError(
+                f"{name}.{kind} musi wskazywać różne istniejące identyfikatory grafu docelowego."
+            )
+        maps.append(mapping)
+    nodes, edges = maps
+    for edge, (source, target) in interface.edges.items():
+        if side.edges[edges[edge]] != (nodes[source], nodes[target]):
+            raise ValueError(
+                f"Morfizm {name} nie zachowuje końców krawędzi {edge!r} z K."
+            )
+    return Match(nodes, edges)
+
+
+def _rule_map(
+    data: dict[str, object], key: str, interface: Graph, side: Graph, side_name: str
+) -> Match:
+    if key in data:
+        return _morphism(data[key], interface, side, f"rule.{key}")
+    # Legacy files describe inclusions by equal ids, but their K remains authoritative.
+    _validate_interface(interface, side, side_name)
+    return Match(
+        {node: node for node in interface.nodes},
+        {edge: edge for edge in interface.edges},
+    )
+
+
 def parse_rule_input(document: object) -> tuple[Graph, Rule]:
     """Validate the host graph and rule from a JSON document, ignoring the match.
 
@@ -83,9 +147,9 @@ def parse_rule_input(document: object) -> tuple[Graph, Rule]:
     host = _graph(data.get("graph"), "G")
     rule = _object(data.get("rule"), "rule")
     left, interface, right = (_graph(rule.get(name), name) for name in ("L", "K", "R"))
-    _validate_interface(interface, left, "L")
-    _validate_interface(interface, right, "R")
-    return host, Rule(left, interface, right)
+    left_map = _rule_map(rule, "l", interface, left, "L")
+    right_map = _rule_map(rule, "r", interface, right, "R")
+    return host, Rule(left, interface, right, left_map, right_map)
 
 
 def parse_input(document: object) -> tuple[Graph, Rule, Match]:

@@ -1,0 +1,175 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "label": "Start"
+      },
+      {
+        "id": "a1",
+        "label": "A"
+      },
+      {
+        "id": "a2",
+        "label": "A"
+      },
+      {
+        "id": "b1",
+        "label": "B"
+      },
+      {
+        "id": "b2",
+        "label": "B"
+      },
+      {
+        "id": "end",
+        "label": "Koniec"
+      }
+    ],
+    "edges": [
+      {
+        "id": "sa",
+        "source": "start",
+        "target": "a1"
+      },
+      {
+        "id": "aa",
+        "source": "a1",
+        "target": "a2"
+      },
+      {
+        "id": "ab1",
+        "source": "a1",
+        "target": "b1"
+      },
+      {
+        "id": "ab2",
+        "source": "a2",
+        "target": "b2"
+      },
+      {
+        "id": "be1",
+        "source": "b1",
+        "target": "end"
+      },
+      {
+        "id": "be2",
+        "source": "b2",
+        "target": "end"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        {
+          "id": "x",
+          "label": "Węzeł"
+        },
+        {
+          "id": "y",
+          "label": "Węzeł"
+        }
+      ],
+      "edges": [
+        {
+          "id": "xy",
+          "source": "x",
+          "target": "y"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        {
+          "id": "x",
+          "label": "Węzeł"
+        },
+        {
+          "id": "y",
+          "label": "Węzeł"
+        }
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        {
+          "id": "x",
+          "label": "Węzeł"
+        },
+        {
+          "id": "y",
+          "label": "Węzeł"
+        },
+        {
+          "id": "relay",
+          "label": "A"
+        }
+      ],
+      "edges": [
+        {
+          "id": "xr",
+          "source": "x",
+          "target": "relay"
+        },
+        {
+          "id": "ry",
+          "source": "relay",
+          "target": "y"
+        }
+      ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "a1",
+      "y": "b1"
+    },
+    "edges": {
+      "xy": "ab1"
+    }
+  },
+  "layout": {
+    "G": {
+      "start": {
+        "x": 40,
+        "y": 180
+      },
+      "a1": {
+        "x": 180,
+        "y": 100
+      },
+      "a2": {
+        "x": 180,
+        "y": 280
+      },
+      "b1": {
+        "x": 380,
+        "y": 100
+      },
+      "b2": {
+        "x": 380,
+        "y": 280
+      },
+      "end": {
+        "x": 540,
+        "y": 180
+      }
+    }
+  }
+}

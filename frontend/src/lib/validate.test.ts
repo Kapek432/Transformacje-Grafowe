@@ -10,7 +10,7 @@ describe("validateDocument", () => {
   it("reports duplicates and missing ends", () => {
     const doc = emptyDocument();
     doc.graph = {
-      nodes: ["a", "a"],
+      nodes: [{"id": "a", "label": "a"}, {"id": "a", "label": "a"}],
       edges: [
         { id: "e", source: "a", target: "b" },
         { id: "e", source: "a", target: "a" },
@@ -24,16 +24,10 @@ describe("validateDocument", () => {
     ]);
   });
 
-  it("reports an edge id with different ends in L and R", () => {
+  it("allows coincident ids with different ends outside the image of K", () => {
     const doc = emptyDocument();
-    doc.rule.L = { nodes: ["a", "b"], edges: [{ id: "x", source: "a", target: "b" }] };
-    doc.rule.R = { nodes: ["a", "b"], edges: [{ id: "x", source: "b", target: "a" }] };
-
-    expect(validateDocument(doc)).toEqual([
-      {
-        graph: "R",
-        message: 'Krawędź "x" występuje w L i R z różnymi końcami. Zmień jej id albo końce.',
-      },
-    ]);
+    doc.rule.L = { nodes: [{"id": "a", "label": "a"}, {"id": "b", "label": "b"}], edges: [{ id: "x", source: "a", target: "b" }] };
+    doc.rule.R = { nodes: [{"id": "a", "label": "a"}, {"id": "b", "label": "b"}], edges: [{ id: "x", source: "b", target: "a" }] };
+    expect(validateDocument(doc)).toEqual([]);
   });
 });

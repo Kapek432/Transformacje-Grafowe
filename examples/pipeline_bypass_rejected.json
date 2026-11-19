@@ -1,16 +1,46 @@
 {
   "graph": {
     "nodes": [
-      "Input",
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "Output",
-      "Monitor",
-      "Archive"
+      {
+        "id": "Input",
+        "label": "Input"
+      },
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      },
+      {
+        "id": "F",
+        "label": "F"
+      },
+      {
+        "id": "Output",
+        "label": "Output"
+      },
+      {
+        "id": "Monitor",
+        "label": "Monitor"
+      },
+      {
+        "id": "Archive",
+        "label": "Archive"
+      }
     ],
     "edges": [
       {
@@ -73,9 +103,18 @@
   "rule": {
     "L": {
       "nodes": [
-        "x",
-        "middle",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "middle",
+          "label": "middle"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -92,15 +131,27 @@
     },
     "K": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": []
     },
     "R": {
       "nodes": [
-        "x",
-        "y"
+        {
+          "id": "x",
+          "label": "x"
+        },
+        {
+          "id": "y",
+          "label": "y"
+        }
       ],
       "edges": [
         {
@@ -109,6 +160,20 @@
           "target": "y"
         }
       ]
+    },
+    "l": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
+    },
+    "r": {
+      "nodes": {
+        "x": "x",
+        "y": "y"
+      },
+      "edges": {}
     }
   },
   "match": {

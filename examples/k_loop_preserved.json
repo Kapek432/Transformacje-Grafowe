@@ -1,0 +1,229 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      }
+    ],
+    "edges": [
+      {
+        "id": "loop-a",
+        "source": "A",
+        "target": "A"
+      },
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "cd",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        {
+          "id": "l_a",
+          "label": "A"
+        },
+        {
+          "id": "l_b",
+          "label": "B"
+        }
+      ],
+      "edges": [
+        {
+          "id": "l_aa",
+          "source": "l_a",
+          "target": "l_a"
+        },
+        {
+          "id": "l_ab",
+          "source": "l_a",
+          "target": "l_b"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        {
+          "id": "k_a",
+          "label": "A"
+        },
+        {
+          "id": "k_b",
+          "label": "B"
+        }
+      ],
+      "edges": [
+        {
+          "id": "k_aa",
+          "source": "k_a",
+          "target": "k_a"
+        },
+        {
+          "id": "k_ab",
+          "source": "k_a",
+          "target": "k_b"
+        }
+      ]
+    },
+    "R": {
+      "nodes": [
+        {
+          "id": "r_a",
+          "label": "A"
+        },
+        {
+          "id": "r_b",
+          "label": "B"
+        },
+        {
+          "id": "r_new",
+          "label": "NEW"
+        }
+      ],
+      "edges": [
+        {
+          "id": "r_aa",
+          "source": "r_a",
+          "target": "r_a"
+        },
+        {
+          "id": "r_ab",
+          "source": "r_a",
+          "target": "r_b"
+        },
+        {
+          "id": "r_bn",
+          "source": "r_b",
+          "target": "r_new"
+        },
+        {
+          "id": "r_nn",
+          "source": "r_new",
+          "target": "r_new"
+        }
+      ]
+    },
+    "l": {
+      "nodes": {
+        "k_a": "l_a",
+        "k_b": "l_b"
+      },
+      "edges": {
+        "k_aa": "l_aa",
+        "k_ab": "l_ab"
+      }
+    },
+    "r": {
+      "nodes": {
+        "k_a": "r_a",
+        "k_b": "r_b"
+      },
+      "edges": {
+        "k_aa": "r_aa",
+        "k_ab": "r_ab"
+      }
+    }
+  },
+  "match": {
+    "nodes": {
+      "l_a": "A",
+      "l_b": "B"
+    },
+    "edges": {
+      "l_aa": "loop-a",
+      "l_ab": "ab"
+    }
+  },
+  "layout": {
+    "G": {
+      "A": {
+        "x": 0,
+        "y": 0
+      },
+      "B": {
+        "x": 160,
+        "y": 0
+      },
+      "C": {
+        "x": 320,
+        "y": 0
+      },
+      "D": {
+        "x": 0,
+        "y": 140
+      },
+      "E": {
+        "x": 160,
+        "y": 140
+      }
+    },
+    "L": {
+      "l_a": {
+        "x": 0,
+        "y": 0
+      },
+      "l_b": {
+        "x": 160,
+        "y": 0
+      }
+    },
+    "K": {
+      "k_a": {
+        "x": 0,
+        "y": 0
+      },
+      "k_b": {
+        "x": 160,
+        "y": 0
+      }
+    },
+    "R": {
+      "r_a": {
+        "x": 0,
+        "y": 0
+      },
+      "r_b": {
+        "x": 160,
+        "y": 0
+      },
+      "r_new": {
+        "x": 320,
+        "y": 0
+      }
+    }
+  }
+}
