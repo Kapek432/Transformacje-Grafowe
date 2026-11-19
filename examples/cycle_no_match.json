@@ -1,0 +1,147 @@
+{
+  "graph": {
+    "nodes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J"
+    ],
+    "edges": [
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "ac",
+        "source": "A",
+        "target": "C"
+      },
+      {
+        "id": "bd",
+        "source": "B",
+        "target": "D"
+      },
+      {
+        "id": "cd",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "df",
+        "source": "D",
+        "target": "F"
+      },
+      {
+        "id": "eg",
+        "source": "E",
+        "target": "G"
+      },
+      {
+        "id": "fg",
+        "source": "F",
+        "target": "G"
+      },
+      {
+        "id": "gh",
+        "source": "G",
+        "target": "H"
+      },
+      {
+        "id": "hi",
+        "source": "H",
+        "target": "I"
+      },
+      {
+        "id": "ij",
+        "source": "I",
+        "target": "J"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x",
+        "y",
+        "z"
+      ],
+      "edges": [
+        {
+          "id": "xy",
+          "source": "x",
+          "target": "y"
+        },
+        {
+          "id": "yz",
+          "source": "y",
+          "target": "z"
+        },
+        {
+          "id": "zx",
+          "source": "z",
+          "target": "x"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x",
+        "y",
+        "z"
+      ],
+      "edges": [
+        {
+          "id": "xy",
+          "source": "x",
+          "target": "y"
+        },
+        {
+          "id": "yz",
+          "source": "y",
+          "target": "z"
+        },
+        {
+          "id": "zx",
+          "source": "z",
+          "target": "x"
+        }
+      ]
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "y",
+        "z"
+      ],
+      "edges": [
+        {
+          "id": "xy",
+          "source": "x",
+          "target": "y"
+        },
+        {
+          "id": "yz",
+          "source": "y",
+          "target": "z"
+        },
+        {
+          "id": "zx",
+          "source": "z",
+          "target": "x"
+        }
+      ]
+    }
+  }
+}

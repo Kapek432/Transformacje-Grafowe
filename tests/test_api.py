@@ -12,7 +12,15 @@ from graph_dpo.api import create_app
 
 PROJECT = Path(__file__).resolve().parents[1]
 EXPECTED_EXAMPLES = [
+    "connect_components",
+    "cycle_no_match",
+    "diamond_expand",
+    "loop_cleanup_network",
+    "name_collisions",
+    "parallel_bundle",
     "parallel_edges",
+    "pipeline_bypass",
+    "pipeline_bypass_rejected",
     "remove_leaf",
     "remove_loop",
     "remove_vertex_rejected",
@@ -174,3 +182,24 @@ def test_lists_only_valid_example_names(client: TestClient, examples: Path) -> N
     (examples / "bad name.json").write_text("{}", encoding="utf-8")
 
     assert client.get("/api/examples").json() == EXPECTED_EXAMPLES
+
+
+@pytest.mark.parametrize(
+    ("count", "truncated"), [(199, False), (200, False), (201, True)]
+)
+def test_match_limit_boundary(client: TestClient, count: int, truncated: bool) -> None:
+    singleton = {"nodes": ["x"], "edges": []}
+    document = {
+        "graph": {"nodes": [f"v{i}" for i in range(count)], "edges": []},
+        "rule": {"L": singleton, "K": singleton, "R": singleton},
+    }
+
+    response = client.post("/api/matches", json=document)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["matches"]) == min(count, 200)
+    assert body["truncated"] is truncated
+    assert [match["nodes"]["x"] for match in body["matches"]] == [
+        f"v{i}" for i in range(min(count, 200))
+    ]

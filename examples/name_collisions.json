@@ -1,0 +1,96 @@
+{
+  "graph": {
+    "nodes": [
+      "Start",
+      "A",
+      "B",
+      "End",
+      "relay",
+      "relay_1",
+      "relay_2",
+      "Archive"
+    ],
+    "edges": [
+      {
+        "id": "start",
+        "source": "Start",
+        "target": "A"
+      },
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "end",
+        "source": "B",
+        "target": "End"
+      },
+      {
+        "id": "to-relay",
+        "source": "relay",
+        "target": "Archive"
+      },
+      {
+        "id": "from-relay",
+        "source": "Archive",
+        "target": "relay_1"
+      },
+      {
+        "id": "to-relay_1",
+        "source": "relay_1",
+        "target": "relay_2"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": [
+        {
+          "id": "old",
+          "source": "x",
+          "target": "y"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "y",
+        "relay"
+      ],
+      "edges": [
+        {
+          "id": "to-relay",
+          "source": "x",
+          "target": "relay"
+        },
+        {
+          "id": "from-relay",
+          "source": "relay",
+          "target": "y"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "A",
+      "y": "B"
+    },
+    "edges": {
+      "old": "ab"
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "graph": {
+    "nodes": [
+      "Input",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "Output",
+      "Monitor",
+      "Archive"
+    ],
+    "edges": [
+      {
+        "id": "in-a",
+        "source": "Input",
+        "target": "A"
+      },
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "cd",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "ef",
+        "source": "E",
+        "target": "F"
+      },
+      {
+        "id": "out",
+        "source": "F",
+        "target": "Output"
+      },
+      {
+        "id": "monitor",
+        "source": "Monitor",
+        "target": "D"
+      },
+      {
+        "id": "archive",
+        "source": "Output",
+        "target": "Archive"
+      },
+      {
+        "id": "audit",
+        "source": "Archive",
+        "target": "Archive"
+      },
+      {
+        "id": "monitor-b",
+        "source": "Monitor",
+        "target": "B"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x",
+        "middle",
+        "y"
+      ],
+      "edges": [
+        {
+          "id": "in",
+          "source": "x",
+          "target": "middle"
+        },
+        {
+          "id": "out",
+          "source": "middle",
+          "target": "y"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": [
+        {
+          "id": "bypass",
+          "source": "x",
+          "target": "y"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "A",
+      "middle": "B",
+      "y": "C"
+    },
+    "edges": {
+      "in": "ab",
+      "out": "bc"
+    }
+  }
+}

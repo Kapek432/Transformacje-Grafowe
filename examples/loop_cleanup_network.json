@@ -1,0 +1,117 @@
+{
+  "graph": {
+    "nodes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H"
+    ],
+    "edges": [
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "cd",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "da",
+        "source": "D",
+        "target": "A"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "ef",
+        "source": "E",
+        "target": "F"
+      },
+      {
+        "id": "fg",
+        "source": "F",
+        "target": "G"
+      },
+      {
+        "id": "gh",
+        "source": "G",
+        "target": "H"
+      },
+      {
+        "id": "loop-a",
+        "source": "A",
+        "target": "A"
+      },
+      {
+        "id": "loop-d",
+        "source": "D",
+        "target": "D"
+      },
+      {
+        "id": "loop-h",
+        "source": "H",
+        "target": "H"
+      },
+      {
+        "id": "loop-h-2",
+        "source": "H",
+        "target": "H"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x"
+      ],
+      "edges": [
+        {
+          "id": "old-loop",
+          "source": "x",
+          "target": "x"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "marker"
+      ],
+      "edges": [
+        {
+          "id": "mark",
+          "source": "x",
+          "target": "marker"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "D"
+    },
+    "edges": {
+      "old-loop": "loop-d"
+    }
+  }
+}

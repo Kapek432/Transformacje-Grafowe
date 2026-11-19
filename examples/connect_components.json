@@ -1,0 +1,105 @@
+{
+  "graph": {
+    "nodes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J"
+    ],
+    "edges": [
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "ca",
+        "source": "C",
+        "target": "A"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "ef",
+        "source": "E",
+        "target": "F"
+      },
+      {
+        "id": "fd",
+        "source": "F",
+        "target": "D"
+      },
+      {
+        "id": "gh",
+        "source": "G",
+        "target": "H"
+      },
+      {
+        "id": "hi",
+        "source": "H",
+        "target": "I"
+      },
+      {
+        "id": "ij",
+        "source": "I",
+        "target": "J"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": []
+    },
+    "K": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "y",
+        "bridge"
+      ],
+      "edges": [
+        {
+          "id": "bridge-in",
+          "source": "x",
+          "target": "bridge"
+        },
+        {
+          "id": "bridge-out",
+          "source": "bridge",
+          "target": "y"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "C",
+      "y": "D"
+    },
+    "edges": {}
+  }
+}

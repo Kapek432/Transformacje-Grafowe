@@ -1,0 +1,138 @@
+{
+  "graph": {
+    "nodes": [
+      "Source",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "Sink",
+      "Monitor"
+    ],
+    "edges": [
+      {
+        "id": "src",
+        "source": "Source",
+        "target": "A"
+      },
+      {
+        "id": "ab-1",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "ab-2",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "ab-3",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "bc",
+        "source": "B",
+        "target": "C"
+      },
+      {
+        "id": "cd-1",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "cd-2",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "out",
+        "source": "E",
+        "target": "Sink"
+      },
+      {
+        "id": "watch",
+        "source": "Monitor",
+        "target": "B"
+      },
+      {
+        "id": "return",
+        "source": "Sink",
+        "target": "Source"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": [
+        {
+          "id": "keep",
+          "source": "x",
+          "target": "y"
+        },
+        {
+          "id": "replace",
+          "source": "x",
+          "target": "y"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "x",
+        "y"
+      ],
+      "edges": [
+        {
+          "id": "keep",
+          "source": "x",
+          "target": "y"
+        }
+      ]
+    },
+    "R": {
+      "nodes": [
+        "x",
+        "y",
+        "relay"
+      ],
+      "edges": [
+        {
+          "id": "keep",
+          "source": "x",
+          "target": "y"
+        },
+        {
+          "id": "to-relay",
+          "source": "x",
+          "target": "relay"
+        },
+        {
+          "id": "from-relay",
+          "source": "relay",
+          "target": "y"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "x": "A",
+      "y": "B"
+    },
+    "edges": {
+      "keep": "ab-1",
+      "replace": "ab-2"
+    }
+  }
+}

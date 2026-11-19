@@ -59,6 +59,19 @@ Wybierz nazwę z listy w UI albo uruchom plik przez CLI. Każdy przykład zawier
 - [slide8.json](examples/slide8.json) - większy przykład z materiałów: usuwanie fragmentu grafu i dodawanie nowych wierzchołków oraz krawędzi.
 - [slide8_rejected.json](examples/slide8_rejected.json) - wariant poprzedniego przykładu, w którym dodatkowa krawędź E → C blokuje zapisane dopasowanie.
 
+### Większe scenariusze
+
+Te przykłady mają od 8 do 11 wierzchołków i pokazują wpływ reguły na większy kontekst. Liczby dopasowań dotyczą całego wyszukiwania w UI, a opis transformacji dotyczy zapisanego `match`.
+
+- [pipeline_bypass.json](examples/pipeline_bypass.json) - sieć z 10 wierzchołkami, monitorem, archiwum i pętlą. Usunięcie B zastępuje A → B → C połączeniem A → C. Spośród 8 dopasowań 6 jest dozwolonych; dodatkowe połączenia mogą zablokować usunięcie innego węzła.
+- [pipeline_bypass_rejected.json](examples/pipeline_bypass_rejected.json) - dodatkowa krawędź `monitor-b` blokuje zapisane usunięcie B. W całej sieci jest 9 dopasowań, z czego 5 można zastosować.
+- [diamond_expand.json](examples/diamond_expand.json) - dwa połączone „diamenty”, sprzężenie zwrotne i zewnętrzny monitor. Pierwszy diament zostaje rozbudowany do czterech nowych węzłów, a drugi i jego otoczenie pozostają zachowane. Są 4 dopasowania, ponieważ ramiona diamentu można zamienić miejscami.
+- [parallel_bundle.json](examples/parallel_bundle.json) - sieć z wiązkami dwóch i trzech równoległych krawędzi. Reguła zachowuje jedną krawędź w K, a drugą zastępuje ścieżką przez `relay`; trzecia pozostaje częścią kontekstu. Łącznie 8 dopasowań różniących się wyborem krawędzi.
+- [loop_cleanup_network.json](examples/loop_cleanup_network.json) - cykl i dalszy łańcuch z czterema pętlami, w tym dwiema równoległymi. Wybrana pętla na D zostaje zastąpiona odgałęzieniem do `marker`; pozostałe połączenia i pętle nie zmieniają się.
+- [name_collisions.json](examples/name_collisions.json) - w grafie istnieją już `relay`, `relay_1`, `relay_2` oraz nazwy nowych krawędzi. Reguła dodaje więc `relay_3`, `to-relay_2` i `from-relay_1`, zachowując dotychczasowe elementy o kolidujących nazwach.
+- [connect_components.json](examples/connect_components.json) - dwa osobne cykle i rozłączny łańcuch. Reguła wybiera dwa różne wierzchołki i dodaje pomost przez `bridge`. Jest 90 dopasowań; zapisane dopasowanie łączy pierwszy i drugi cykl. Inne wybory mogą połączyć wierzchołki tej samej składowej.
+- [cycle_no_match.json](examples/cycle_no_match.json) - rozgałęziony graf acykliczny i reguła szukająca skierowanego trójkąta. UI pokazuje zero dopasowań. Plik celowo nie zawiera `match`: nadaje się do wyszukiwania w UI, a CLI zgłasza brak dopasowania wejściowego (kod `1`).
+
 Na przykład:
 
 ```sh
@@ -153,3 +166,5 @@ uv run python -m pytest -q
 uv run ruff check .
 cd frontend && npm test && npm run typecheck
 ```
+
+Testy backendu obejmują wszystkie przykłady przez API, większe przykłady przez CLI, dokładne wyniki transformacji i zachowanie kontekstu dla każdego znalezionego dopasowania. Wyszukiwanie dopasowań jest porównywane z niezależnym przeglądem wszystkich injektywnych odwzorowań na 20 małych grafach z ustalonymi ziarnami losowania i 6 wzorcach (120 przypadków). Osobne przypadki sprawdzają błędne dane, nieinjektywne odwzorowania, warunek wiszącej krawędzi dla krawędzi przychodzących, wychodzących i pętli, puste grafy, tworzenie i usuwanie całej składowej, kolizje nazw oraz granicę limitu dopasowań.

@@ -1,0 +1,179 @@
+{
+  "graph": {
+    "nodes": [
+      "Source",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "Sink",
+      "Audit"
+    ],
+    "edges": [
+      {
+        "id": "src",
+        "source": "Source",
+        "target": "A"
+      },
+      {
+        "id": "ab",
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "id": "ac",
+        "source": "A",
+        "target": "C"
+      },
+      {
+        "id": "bd",
+        "source": "B",
+        "target": "D"
+      },
+      {
+        "id": "cd",
+        "source": "C",
+        "target": "D"
+      },
+      {
+        "id": "de",
+        "source": "D",
+        "target": "E"
+      },
+      {
+        "id": "ef",
+        "source": "E",
+        "target": "F"
+      },
+      {
+        "id": "eg",
+        "source": "E",
+        "target": "G"
+      },
+      {
+        "id": "fh",
+        "source": "F",
+        "target": "H"
+      },
+      {
+        "id": "gh",
+        "source": "G",
+        "target": "H"
+      },
+      {
+        "id": "sink",
+        "source": "H",
+        "target": "Sink"
+      },
+      {
+        "id": "audit",
+        "source": "Audit",
+        "target": "D"
+      },
+      {
+        "id": "feedback",
+        "source": "Sink",
+        "target": "Source"
+      }
+    ]
+  },
+  "rule": {
+    "L": {
+      "nodes": [
+        "s",
+        "p",
+        "q",
+        "t"
+      ],
+      "edges": [
+        {
+          "id": "sp",
+          "source": "s",
+          "target": "p"
+        },
+        {
+          "id": "sq",
+          "source": "s",
+          "target": "q"
+        },
+        {
+          "id": "pt",
+          "source": "p",
+          "target": "t"
+        },
+        {
+          "id": "qt",
+          "source": "q",
+          "target": "t"
+        }
+      ]
+    },
+    "K": {
+      "nodes": [
+        "s",
+        "t"
+      ],
+      "edges": []
+    },
+    "R": {
+      "nodes": [
+        "s",
+        "t",
+        "split",
+        "upper",
+        "lower",
+        "merge"
+      ],
+      "edges": [
+        {
+          "id": "entry",
+          "source": "s",
+          "target": "split"
+        },
+        {
+          "id": "upper-in",
+          "source": "split",
+          "target": "upper"
+        },
+        {
+          "id": "lower-in",
+          "source": "split",
+          "target": "lower"
+        },
+        {
+          "id": "upper-out",
+          "source": "upper",
+          "target": "merge"
+        },
+        {
+          "id": "lower-out",
+          "source": "lower",
+          "target": "merge"
+        },
+        {
+          "id": "exit",
+          "source": "merge",
+          "target": "t"
+        }
+      ]
+    }
+  },
+  "match": {
+    "nodes": {
+      "s": "A",
+      "p": "B",
+      "q": "C",
+      "t": "D"
+    },
+    "edges": {
+      "sp": "ab",
+      "sq": "ac",
+      "pt": "bd",
+      "qt": "cd"
+    }
+  }
+}
